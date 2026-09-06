@@ -1,1237 +1,2296 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Control de Personal</title>
-<meta name="description" content="Panel de recursos humanos para una pequeña empresa: registro de empleados, asistencia, ausencias e historial.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-<style>
-img{max-width:100%}
-[hidden]{display:none!important}
-:root{color-scheme:light dark}
-:root{
-  --ground:#F4F6F3; --surface:#FFFFFF; --surface-2:#FBFCFA;
-  --ink:#1B2320; --muted:#5C6862; --faint:#8A968F;
-  --line:#E1E6E1; --line-strong:#CFD7D0;
-  --accent:#0E6E5C; --accent-ink:#0A5346; --accent-soft:#DCEAE4; --on-accent:#FFFFFF;
-  --ok:#2F7D4F; --ok-soft:#E1F0E4;
-  --warn:#9C6410; --warn-soft:#F6EAD5;
-  --crit:#B23B3B; --crit-soft:#F5E0DE;
-  --info:#35617D; --info-soft:#E0EAF0;
-  --shadow:0 1px 2px rgba(27,35,32,.06), 0 6px 20px -8px rgba(27,35,32,.14);
-  --radius:10px;
-  --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-  --display:"Bricolage Grotesque",var(--sans);
-  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --ground:#121815; --surface:#1B231F; --surface-2:#202924;
-    --ink:#E7EDE8; --muted:#9DAAA2; --faint:#75837B;
-    --line:#2C3833; --line-strong:#3A4842;
-    --accent:#54C1A7; --accent-ink:#8FD9C8; --accent-soft:#1E3A33; --on-accent:#08201B;
-    --ok:#63BE86; --ok-soft:#1C3327;
-    --warn:#D69B4E; --warn-soft:#3A2E1A;
-    --crit:#E08079; --crit-soft:#3A231F;
-    --info:#7FB0CC; --info-soft:#1D2E39;
-    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -10px rgba(0,0,0,.5);
-  }
-}
-:root[data-theme="dark"]{
-  --ground:#121815; --surface:#1B231F; --surface-2:#202924;
-  --ink:#E7EDE8; --muted:#9DAAA2; --faint:#75837B;
-  --line:#2C3833; --line-strong:#3A4842;
-  --accent:#54C1A7; --accent-ink:#8FD9C8; --accent-soft:#1E3A33;
-  --ok:#63BE86; --ok-soft:#1C3327;
-  --warn:#D69B4E; --warn-soft:#3A2E1A;
-  --crit:#E08079; --crit-soft:#3A231F;
-  --info:#7FB0CC; --info-soft:#1D2E39;
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -10px rgba(0,0,0,.5);
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{
-  background:var(--ground); color:var(--ink); font-family:var(--sans);
-  font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
-}
-h1,h2,h3{font-family:var(--display); font-weight:700; margin:0; text-wrap:balance; letter-spacing:-.01em}
-button{font-family:inherit; font-size:inherit; cursor:pointer}
-input,select,textarea{font-family:inherit; font-size:inherit; color:inherit}
-a{color:var(--accent-ink)}
-.num{font-variant-numeric:tabular-nums}
-.mono{font-family:var(--mono)}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HOLA</title>
+  <meta name="description"
+    content="Panel de recursos humanos para una pequeña empresa: registro de empleados, asistencia, ausencias e historial.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    img {
+      max-width: 100%
+    }
 
-/* ---------- shell ---------- */
-.app{display:grid; grid-template-columns:236px 1fr; min-height:100vh}
-.side{
-  background:var(--surface); border-right:1px solid var(--line);
-  display:flex; flex-direction:column; padding:20px 14px; gap:6px;
-  position:sticky; top:0; height:100vh;
-}
-.brand{display:flex; align-items:center; gap:10px; padding:4px 8px 16px}
-.brand .mark{
-  width:30px; height:30px; border-radius:8px; background:var(--accent);
-  display:grid; place-items:center; color:var(--on-accent); font-family:var(--display);
-  font-weight:700; font-size:15px; flex:none;
-}
-.brand b{font-family:var(--display); font-weight:700; font-size:15px; line-height:1.15; letter-spacing:-.01em}
-.brand span{display:block; font-size:11px; color:var(--faint); font-weight:500}
-.nav{display:flex; flex-direction:column; gap:2px; margin-top:4px}
-.nav button{
-  display:flex; align-items:center; gap:10px; width:100%; text-align:left;
-  padding:9px 10px; border:0; background:none; color:var(--muted);
-  border-radius:8px; font-weight:500;
-}
-.nav button:hover{background:var(--surface-2); color:var(--ink)}
-.nav button.active{background:var(--accent-soft); color:var(--accent-ink); font-weight:600}
-.nav button .ico{width:18px; height:18px; flex:none; opacity:.9}
-.nav .count{margin-left:auto; font-size:11px; background:var(--ground); color:var(--muted); border-radius:999px; padding:1px 7px; font-variant-numeric:tabular-nums}
-.nav button.active .count{background:var(--surface); color:var(--accent-ink)}
-.side .foot{margin-top:auto; display:flex; flex-direction:column; gap:8px; padding:8px}
-.side .foot small{color:var(--faint); font-size:11px; line-height:1.4}
-.side .foot small b{color:var(--muted); font-weight:600}
-.foot-row{display:flex; gap:6px}
-.themebtn{flex:1; border:1px solid var(--line); background:var(--surface-2); color:var(--muted); border-radius:8px; padding:7px 10px; font-weight:500; display:flex; align-items:center; gap:6px; justify-content:center; font-size:12px}
-.themebtn:hover{color:var(--ink); border-color:var(--line-strong)}
+    [hidden] {
+      display: none !important
+    }
 
-.main{padding:26px 30px 60px; min-width:0; max-width:1200px}
-.page-head{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:22px; flex-wrap:wrap}
-.page-head h1{font-size:26px}
-.page-head p{margin:4px 0 0; color:var(--muted); font-size:13px}
-.eyebrow{font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--faint); font-weight:600}
+    :root {
+      color-scheme: light dark
+    }
 
-.btn{
-  border:1px solid var(--accent); background:var(--accent); color:var(--on-accent);
-  border-radius:8px; padding:9px 15px; font-weight:600; display:inline-flex;
-  align-items:center; gap:7px; white-space:nowrap;
-}
-.btn:hover{background:var(--accent-ink); border-color:var(--accent-ink); color:var(--on-accent)}
-.btn.ghost{background:none; color:var(--muted); border-color:var(--line-strong)}
-.btn.ghost:hover{background:var(--surface-2); color:var(--ink)}
-.btn.sm{padding:6px 11px; font-size:12.5px}
-.btn.danger{background:none; color:var(--crit); border-color:var(--crit-soft)}
-.btn.danger:hover{background:var(--crit-soft)}
+    :root {
+      --ground: #F4F6F3;
+      --surface: #FFFFFF;
+      --surface-2: #FBFCFA;
+      --ink: #1B2320;
+      --muted: #5C6862;
+      --faint: #8A968F;
+      --line: #E1E6E1;
+      --line-strong: #CFD7D0;
+      --accent: #0E6E5C;
+      --accent-ink: #0A5346;
+      --accent-soft: #DCEAE4;
+      --on-accent: #FFFFFF;
+      --ok: #2F7D4F;
+      --ok-soft: #E1F0E4;
+      --warn: #9C6410;
+      --warn-soft: #F6EAD5;
+      --crit: #B23B3B;
+      --crit-soft: #F5E0DE;
+      --info: #35617D;
+      --info-soft: #E0EAF0;
+      --shadow: 0 1px 2px rgba(27, 35, 32, .06), 0 6px 20px -8px rgba(27, 35, 32, .14);
+      --radius: 10px;
+      --sans: "IBM Plex Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      --display: "Bricolage Grotesque", var(--sans);
+      --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
 
-/* ---------- sample banner ---------- */
-.banner{
-  display:flex; align-items:center; gap:12px; background:var(--warn-soft);
-  border:1px solid color-mix(in srgb, var(--warn) 30%, transparent);
-  color:var(--warn); border-radius:var(--radius); padding:11px 14px;
-  margin-bottom:20px; font-size:13px; font-weight:500;
-}
-.banner b{font-weight:600}
-.banner button{margin-left:auto; border:1px solid currentColor; color:inherit; background:none; border-radius:7px; padding:5px 10px; font-weight:600; font-size:12px; opacity:.9}
-.banner button:hover{opacity:1}
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --ground: #121815;
+        --surface: #1B231F;
+        --surface-2: #202924;
+        --ink: #E7EDE8;
+        --muted: #9DAAA2;
+        --faint: #75837B;
+        --line: #2C3833;
+        --line-strong: #3A4842;
+        --accent: #54C1A7;
+        --accent-ink: #8FD9C8;
+        --accent-soft: #1E3A33;
+        --on-accent: #08201B;
+        --ok: #63BE86;
+        --ok-soft: #1C3327;
+        --warn: #D69B4E;
+        --warn-soft: #3A2E1A;
+        --crit: #E08079;
+        --crit-soft: #3A231F;
+        --info: #7FB0CC;
+        --info-soft: #1D2E39;
+        --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -10px rgba(0, 0, 0, .5);
+      }
+    }
 
-/* ---------- tiles ---------- */
-.tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px}
-.tile{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px 16px 14px; display:flex; flex-direction:column; gap:6px}
-.tile .k{font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--faint); font-weight:600}
-.tile .v{font-family:var(--display); font-weight:700; font-size:30px; line-height:1; font-variant-numeric:tabular-nums}
-.tile .s{font-size:12px; color:var(--muted)}
-.tile.accent{background:var(--accent-soft); border-color:transparent}
-.tile.accent .v{color:var(--accent-ink)}
-.tile.accent .k{color:var(--accent-ink); opacity:.8}
+    :root[data-theme="dark"] {
+      --ground: #121815;
+      --surface: #1B231F;
+      --surface-2: #202924;
+      --ink: #E7EDE8;
+      --muted: #9DAAA2;
+      --faint: #75837B;
+      --line: #2C3833;
+      --line-strong: #3A4842;
+      --accent: #54C1A7;
+      --accent-ink: #8FD9C8;
+      --accent-soft: #1E3A33;
+      --ok: #63BE86;
+      --ok-soft: #1C3327;
+      --warn: #D69B4E;
+      --warn-soft: #3A2E1A;
+      --crit: #E08079;
+      --crit-soft: #3A231F;
+      --info: #7FB0CC;
+      --info-soft: #1D2E39;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 28px -10px rgba(0, 0, 0, .5);
+    }
 
-.grid-2{display:grid; grid-template-columns:1.1fr 1fr; gap:16px}
-.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:18px}
-.card h2{font-size:15px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between}
-.card h2 .tag{font-size:11px; color:var(--faint); font-weight:500; text-transform:uppercase; letter-spacing:.08em}
+    * {
+      box-sizing: border-box
+    }
 
-/* dept bars */
-.bars{display:flex; flex-direction:column; gap:11px}
-.bar-row{display:grid; grid-template-columns:120px 1fr 34px; align-items:center; gap:10px; font-size:12.5px}
-.bar-row .lbl{color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
-.bar-track{height:8px; background:var(--ground); border-radius:999px; overflow:hidden}
-.bar-fill{height:100%; background:var(--accent); border-radius:999px}
-.bar-row .n{text-align:right; color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums}
+    html,
+    body {
+      margin: 0;
+      padding: 0
+    }
 
-/* alerts */
-.alerts{display:flex; flex-direction:column; gap:2px}
-.alert{display:flex; gap:11px; padding:10px 6px; border-bottom:1px solid var(--line); font-size:13px}
-.alert:last-child{border-bottom:0}
-.alert .dot{width:8px; height:8px; border-radius:999px; margin-top:5px; flex:none; background:var(--faint)}
-.alert.warn .dot{background:var(--warn)} .alert.info .dot{background:var(--info)} .alert.crit .dot{background:var(--crit)}
-.alert .txt b{font-weight:600}
-.alert .txt span{color:var(--muted); display:block; font-size:12px}
-.empty-mini{color:var(--faint); font-size:13px; padding:8px 6px}
+    body {
+      background: var(--ground);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
 
-/* ---------- toolbar ---------- */
-.toolbar{display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap}
-.search{position:relative; flex:1; min-width:200px; max-width:340px}
-.search input{width:100%; padding:9px 12px 9px 34px; border:1px solid var(--line-strong); border-radius:8px; background:var(--surface)}
-.search svg{position:absolute; left:10px; top:50%; transform:translateY(-50%); opacity:.5}
-.filters{display:flex; gap:8px; flex-wrap:wrap}
-.filters select{padding:8px 10px; border:1px solid var(--line-strong); border-radius:8px; background:var(--surface)}
-input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,.nav button:focus-visible{
-  outline:2px solid var(--accent); outline-offset:1px;
-}
+    h1,
+    h2,
+    h3 {
+      font-family: var(--display);
+      font-weight: 700;
+      margin: 0;
+      text-wrap: balance;
+      letter-spacing: -.01em
+    }
 
-/* ---------- table ---------- */
-.table-wrap{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); overflow-x:auto}
-table{width:100%; border-collapse:collapse; font-size:13px}
-thead th{
-  text-align:left; padding:11px 14px; font-size:11px; text-transform:uppercase;
-  letter-spacing:.07em; color:var(--faint); font-weight:600; border-bottom:1px solid var(--line);
-  white-space:nowrap; background:var(--surface-2);
-}
-tbody td{padding:12px 14px; border-bottom:1px solid var(--line); vertical-align:middle}
-tbody tr:last-child td{border-bottom:0}
-tbody tr.clickable{cursor:pointer}
-tbody tr.clickable:hover{background:var(--surface-2)}
-.cell-name{display:flex; align-items:center; gap:10px}
-.avatar{
-  width:30px; height:30px; border-radius:8px; flex:none; display:grid; place-items:center;
-  font-size:12px; font-weight:600; background:var(--accent-soft); color:var(--accent-ink);
-  font-family:var(--display);
-}
-.cell-name b{font-weight:600; display:block}
-.cell-name small{color:var(--faint); font-family:var(--mono); font-size:11px}
-td .sub{color:var(--muted); font-size:12px}
+    button {
+      font-family: inherit;
+      font-size: inherit;
+      cursor: pointer
+    }
 
-.pill{display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:600; white-space:nowrap}
-.pill::before{content:""; width:6px; height:6px; border-radius:999px; background:currentColor}
-.pill.ok{background:var(--ok-soft); color:var(--ok)}
-.pill.warn{background:var(--warn-soft); color:var(--warn)}
-.pill.crit{background:var(--crit-soft); color:var(--crit)}
-.pill.info{background:var(--info-soft); color:var(--info)}
-.pill.muted{background:var(--ground); color:var(--muted)}
-.pill.plain{background:var(--ground); color:var(--muted); font-weight:500}
-.pill.plain::before{display:none}
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit
+    }
 
-.row-actions{display:flex; gap:6px; justify-content:flex-end}
-.icon-btn{border:1px solid var(--line-strong); background:var(--surface); border-radius:7px; padding:5px 8px; color:var(--muted); line-height:1; display:inline-flex}
-.icon-btn:hover{color:var(--ink); border-color:var(--line-strong); background:var(--surface-2)}
+    a {
+      color: var(--accent-ink)
+    }
 
-.empty{padding:56px 20px; text-align:center; color:var(--muted)}
-.empty svg{opacity:.4; margin-bottom:10px}
-.empty b{display:block; color:var(--ink); font-family:var(--display); font-size:16px; margin-bottom:4px}
+    .num {
+      font-variant-numeric: tabular-nums
+    }
 
-/* ---------- drawer ---------- */
-.scrim{position:fixed; inset:0; background:rgba(20,26,23,.42); opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:40}
-.scrim.open{opacity:1; pointer-events:auto}
-.drawer{
-  position:fixed; top:0; right:0; height:100vh; width:min(520px,100vw);
-  background:var(--surface); border-left:1px solid var(--line); box-shadow:var(--shadow);
-  transform:translateX(100%); transition:transform .22s cubic-bezier(.4,0,.2,1);
-  z-index:50; display:flex; flex-direction:column;
-}
-.drawer.open{transform:translateX(0)}
-.drawer-head{padding:20px 24px 16px; border-bottom:1px solid var(--line); display:flex; align-items:flex-start; justify-content:space-between; gap:12px}
-.drawer-head h2{font-size:19px}
-.drawer-head .eyebrow{margin-bottom:3px}
-.drawer-body{padding:20px 24px 28px; overflow-y:auto; flex:1}
-.drawer-foot{padding:14px 24px; border-top:1px solid var(--line); display:flex; gap:10px; justify-content:flex-end; background:var(--surface-2)}
-.x{border:0; background:none; color:var(--muted); padding:4px; border-radius:6px; line-height:1}
-.x:hover{background:var(--ground); color:var(--ink)}
+    .mono {
+      font-family: var(--mono)
+    }
 
-.field{margin-bottom:14px}
-.field label{display:block; font-size:12px; font-weight:600; margin-bottom:5px; color:var(--muted)}
-.field input,.field select,.field textarea{
-  width:100%; padding:9px 11px; border:1px solid var(--line-strong); border-radius:8px; background:var(--surface-2);
-}
-.field textarea{resize:vertical; min-height:64px}
-.field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-.field .hint{font-size:11px; color:var(--faint); margin-top:4px}
-fieldset{border:0; padding:0; margin:0 0 6px}
-fieldset legend{font-size:11px; text-transform:uppercase; letter-spacing:.09em; color:var(--faint); font-weight:600; margin-bottom:10px; padding-top:8px}
+    /* ---------- shell ---------- */
+    .app {
+      display: grid;
+      grid-template-columns: 236px 1fr;
+      min-height: 100vh
+    }
 
-/* ficha (detail) */
-.ficha-top{display:flex; gap:14px; align-items:center; margin-bottom:18px}
-.ficha-top .avatar{width:52px; height:52px; font-size:19px; border-radius:12px}
-.ficha-top b{font-family:var(--display); font-weight:700; font-size:19px; display:block}
-.ficha-top small{color:var(--muted); font-family:var(--mono)}
-.dl{display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; margin-bottom:20px}
-.dl>div{display:flex; flex-direction:column; gap:2px}
-.dl dt{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--faint); font-weight:600}
-.dl dd{margin:0; font-weight:500}
-.sect-title{font-family:var(--display); font-weight:700; font-size:14px; margin:22px 0 10px; display:flex; align-items:center; justify-content:space-between}
-.mini-list{display:flex; flex-direction:column; gap:8px}
-.mini-item{border:1px solid var(--line); border-radius:9px; padding:10px 12px; font-size:12.5px}
-.mini-item .mi-head{display:flex; justify-content:space-between; gap:8px; align-items:center; margin-bottom:3px}
-.mini-item .mi-head b{font-weight:600}
-.mini-item .mi-date{color:var(--faint); font-family:var(--mono); font-size:11px}
-.mini-item p{margin:2px 0 0; color:var(--muted)}
-.prest{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-.prest .pbox{background:var(--surface-2); border:1px solid var(--line); border-radius:9px; padding:11px 12px}
-.prest .pbox .k{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--faint); font-weight:600}
-.prest .pbox .v{font-family:var(--display); font-weight:700; font-size:18px; font-variant-numeric:tabular-nums; margin-top:3px}
-.prest-note{font-size:11px; color:var(--faint); margin-top:8px; grid-column:1/-1}
+    .side {
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 14px;
+      gap: 6px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
 
-/* attendance grid */
-.att-toolbar{display:flex; gap:12px; align-items:center; margin-bottom:14px; flex-wrap:wrap}
-.att-toolbar input[type=date]{padding:8px 10px; border:1px solid var(--line-strong); border-radius:8px; background:var(--surface)}
-.seg{display:inline-flex; border:1px solid var(--line-strong); border-radius:8px; overflow:hidden}
-.seg button{border:0; background:var(--surface); padding:7px 12px; color:var(--muted); font-weight:500; border-right:1px solid var(--line)}
-.seg button:last-child{border-right:0}
-.seg button.on{background:var(--accent-soft); color:var(--accent-ink); font-weight:600}
-.att-status-cell{display:flex; gap:5px; flex-wrap:wrap}
-.chip{border:1px solid var(--line-strong); background:var(--surface); border-radius:999px; padding:4px 10px; font-size:11.5px; font-weight:600; color:var(--muted)}
-.chip.on-presente{background:var(--ok-soft); color:var(--ok); border-color:transparent}
-.chip.on-ausente{background:var(--crit-soft); color:var(--crit); border-color:transparent}
-.chip.on-vacaciones{background:var(--info-soft); color:var(--info); border-color:transparent}
-.chip.on-permiso{background:var(--warn-soft); color:var(--warn); border-color:transparent}
-.chip.on-incapacidad{background:var(--warn-soft); color:var(--warn); border-color:transparent}
-.chip.on-asueto{background:var(--ground); color:var(--muted); border-color:transparent}
-.chip:not(.on-presente):not(.on-ausente):not(.on-vacaciones):not(.on-permiso):not(.on-incapacidad):not(.on-asueto):hover{border-color:var(--accent); color:var(--accent-ink)}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 8px 16px
+    }
 
-.toast{
-  position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px);
-  background:var(--ink); color:var(--ground); padding:10px 18px; border-radius:9px;
-  font-size:13px; font-weight:500; opacity:0; transition:.2s ease; z-index:60; box-shadow:var(--shadow);
-}
-.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+    .brand .mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--accent);
+      display: grid;
+      place-items: center;
+      color: var(--on-accent);
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 15px;
+      flex: none;
+    }
 
-.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+    .brand b {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.15;
+      letter-spacing: -.01em
+    }
 
-@media (max-width:900px){
-  .app{grid-template-columns:1fr}
-  .side{position:static; height:auto; flex-direction:row; flex-wrap:wrap; align-items:center; padding:12px}
-  .brand{padding:0 8px 0 4px}
-  .nav{flex-direction:row; flex-wrap:wrap; margin:0}
-  .nav .count{display:none}
-  .side .foot{margin:0 0 0 auto; flex-direction:row}
-  .side .foot small{display:none}
-  .main{padding:20px 16px 50px}
-  .tiles{grid-template-columns:repeat(2,1fr)}
-  .grid-2{grid-template-columns:1fr}
-  .field-row{grid-template-columns:1fr}
-  .dl{grid-template-columns:1fr}
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+    .brand span {
+      display: block;
+      font-size: 11px;
+      color: var(--faint);
+      font-weight: 500
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 4px
+    }
+
+    .nav button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      padding: 9px 10px;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .nav button:hover {
+      background: var(--surface-2);
+      color: var(--ink)
+    }
+
+    .nav button.active {
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+      font-weight: 600
+    }
+
+    .nav button .ico {
+      width: 18px;
+      height: 18px;
+      flex: none;
+      opacity: .9
+    }
+
+    .nav .count {
+      margin-left: auto;
+      font-size: 11px;
+      background: var(--ground);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 1px 7px;
+      font-variant-numeric: tabular-nums
+    }
+
+    .nav button.active .count {
+      background: var(--surface);
+      color: var(--accent-ink)
+    }
+
+    .side .foot {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 8px
+    }
+
+    .side .foot small {
+      color: var(--faint);
+      font-size: 11px;
+      line-height: 1.4
+    }
+
+    .side .foot small b {
+      color: var(--muted);
+      font-weight: 600
+    }
+
+    .foot-row {
+      display: flex;
+      gap: 6px
+    }
+
+    .themebtn {
+      flex: 1;
+      border: 1px solid var(--line);
+      background: var(--surface-2);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      font-size: 12px
+    }
+
+    .themebtn:hover {
+      color: var(--ink);
+      border-color: var(--line-strong)
+    }
+
+    .main {
+      padding: 26px 30px 60px;
+      min-width: 0;
+      max-width: 1200px
+    }
+
+    .page-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+      flex-wrap: wrap
+    }
+
+    .page-head h1 {
+      font-size: 26px
+    }
+
+    .page-head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--faint);
+      font-weight: 600
+    }
+
+    .btn {
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: var(--on-accent);
+      border-radius: 8px;
+      padding: 9px 15px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--accent-ink);
+      border-color: var(--accent-ink);
+      color: var(--on-accent)
+    }
+
+    .btn.ghost {
+      background: none;
+      color: var(--muted);
+      border-color: var(--line-strong)
+    }
+
+    .btn.ghost:hover {
+      background: var(--surface-2);
+      color: var(--ink)
+    }
+
+    .btn.sm {
+      padding: 6px 11px;
+      font-size: 12.5px
+    }
+
+    .btn.danger {
+      background: none;
+      color: var(--crit);
+      border-color: var(--crit-soft)
+    }
+
+    .btn.danger:hover {
+      background: var(--crit-soft)
+    }
+
+    /* ---------- sample banner ---------- */
+    .banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--warn-soft);
+      border: 1px solid color-mix(in srgb, var(--warn) 30%, transparent);
+      color: var(--warn);
+      border-radius: var(--radius);
+      padding: 11px 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .banner b {
+      font-weight: 600
+    }
+
+    .banner button {
+      margin-left: auto;
+      border: 1px solid currentColor;
+      color: inherit;
+      background: none;
+      border-radius: 7px;
+      padding: 5px 10px;
+      font-weight: 600;
+      font-size: 12px;
+      opacity: .9
+    }
+
+    .banner button:hover {
+      opacity: 1
+    }
+
+    /* ---------- tiles ---------- */
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px
+    }
+
+    .tile {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px
+    }
+
+    .tile .k {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--faint);
+      font-weight: 600
+    }
+
+    .tile .v {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 30px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums
+    }
+
+    .tile .s {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .tile.accent {
+      background: var(--accent-soft);
+      border-color: transparent
+    }
+
+    .tile.accent .v {
+      color: var(--accent-ink)
+    }
+
+    .tile.accent .k {
+      color: var(--accent-ink);
+      opacity: .8
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 16px
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px
+    }
+
+    .card h2 {
+      font-size: 15px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .card h2 .tag {
+      font-size: 11px;
+      color: var(--faint);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .08em
+    }
+
+    /* dept bars */
+    .bars {
+      display: flex;
+      flex-direction: column;
+      gap: 11px
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 34px;
+      align-items: center;
+      gap: 10px;
+      font-size: 12.5px
+    }
+
+    .bar-row .lbl {
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .bar-track {
+      height: 8px;
+      background: var(--ground);
+      border-radius: 999px;
+      overflow: hidden
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 999px
+    }
+
+    .bar-row .n {
+      text-align: right;
+      color: var(--ink);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums
+    }
+
+    /* alerts */
+    .alerts {
+      display: flex;
+      flex-direction: column;
+      gap: 2px
+    }
+
+    .alert {
+      display: flex;
+      gap: 11px;
+      padding: 10px 6px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px
+    }
+
+    .alert:last-child {
+      border-bottom: 0
+    }
+
+    .alert .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      margin-top: 5px;
+      flex: none;
+      background: var(--faint)
+    }
+
+    .alert.warn .dot {
+      background: var(--warn)
+    }
+
+    .alert.info .dot {
+      background: var(--info)
+    }
+
+    .alert.crit .dot {
+      background: var(--crit)
+    }
+
+    .alert .txt b {
+      font-weight: 600
+    }
+
+    .alert .txt span {
+      color: var(--muted);
+      display: block;
+      font-size: 12px
+    }
+
+    .empty-mini {
+      color: var(--faint);
+      font-size: 13px;
+      padding: 8px 6px
+    }
+
+    /* ---------- toolbar ---------- */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap
+    }
+
+    .search {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+      max-width: 340px
+    }
+
+    .search input {
+      width: 100%;
+      padding: 9px 12px 9px 34px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: var(--surface)
+    }
+
+    .search svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: .5
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .filters select {
+      padding: 8px 10px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: var(--surface)
+    }
+
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    button:focus-visible,
+    .nav button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 1px;
+    }
+
+    /* ---------- table ---------- */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow-x: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px
+    }
+
+    thead th {
+      text-align: left;
+      padding: 11px 14px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--faint);
+      font-weight: 600;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+      background: var(--surface-2);
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0
+    }
+
+    tbody tr.clickable {
+      cursor: pointer
+    }
+
+    tbody tr.clickable:hover {
+      background: var(--surface-2)
+    }
+
+    .cell-name {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+      font-family: var(--display);
+    }
+
+    .cell-name b {
+      font-weight: 600;
+      display: block
+    }
+
+    .cell-name small {
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: 11px
+    }
+
+    td .sub {
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap
+    }
+
+    .pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor
+    }
+
+    .pill.ok {
+      background: var(--ok-soft);
+      color: var(--ok)
+    }
+
+    .pill.warn {
+      background: var(--warn-soft);
+      color: var(--warn)
+    }
+
+    .pill.crit {
+      background: var(--crit-soft);
+      color: var(--crit)
+    }
+
+    .pill.info {
+      background: var(--info-soft);
+      color: var(--info)
+    }
+
+    .pill.muted {
+      background: var(--ground);
+      color: var(--muted)
+    }
+
+    .pill.plain {
+      background: var(--ground);
+      color: var(--muted);
+      font-weight: 500
+    }
+
+    .pill.plain::before {
+      display: none
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end
+    }
+
+    .icon-btn {
+      border: 1px solid var(--line-strong);
+      background: var(--surface);
+      border-radius: 7px;
+      padding: 5px 8px;
+      color: var(--muted);
+      line-height: 1;
+      display: inline-flex
+    }
+
+    .icon-btn:hover {
+      color: var(--ink);
+      border-color: var(--line-strong);
+      background: var(--surface-2)
+    }
+
+    .empty {
+      padding: 56px 20px;
+      text-align: center;
+      color: var(--muted)
+    }
+
+    .empty svg {
+      opacity: .4;
+      margin-bottom: 10px
+    }
+
+    .empty b {
+      display: block;
+      color: var(--ink);
+      font-family: var(--display);
+      font-size: 16px;
+      margin-bottom: 4px
+    }
+
+    /* ---------- drawer ---------- */
+    .scrim {
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 26, 23, .42);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+      z-index: 40
+    }
+
+    .scrim.open {
+      opacity: 1;
+      pointer-events: auto
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: min(520px, 100vw);
+      background: var(--surface);
+      border-left: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      transform: translateX(100%);
+      transition: transform .22s cubic-bezier(.4, 0, .2, 1);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer.open {
+      transform: translateX(0)
+    }
+
+    .drawer-head {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px
+    }
+
+    .drawer-head h2 {
+      font-size: 19px
+    }
+
+    .drawer-head .eyebrow {
+      margin-bottom: 3px
+    }
+
+    .drawer-body {
+      padding: 20px 24px 28px;
+      overflow-y: auto;
+      flex: 1
+    }
+
+    .drawer-foot {
+      padding: 14px 24px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      background: var(--surface-2)
+    }
+
+    .x {
+      border: 0;
+      background: none;
+      color: var(--muted);
+      padding: 4px;
+      border-radius: 6px;
+      line-height: 1
+    }
+
+    .x:hover {
+      background: var(--ground);
+      color: var(--ink)
+    }
+
+    .field {
+      margin-bottom: 14px
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--muted)
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: var(--surface-2);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 64px
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px
+    }
+
+    .field .hint {
+      font-size: 11px;
+      color: var(--faint);
+      margin-top: 4px
+    }
+
+    fieldset {
+      border: 0;
+      padding: 0;
+      margin: 0 0 6px
+    }
+
+    fieldset legend {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--faint);
+      font-weight: 600;
+      margin-bottom: 10px;
+      padding-top: 8px
+    }
+
+    /* ficha (detail) */
+    .ficha-top {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 18px
+    }
+
+    .ficha-top .avatar {
+      width: 52px;
+      height: 52px;
+      font-size: 19px;
+      border-radius: 12px
+    }
+
+    .ficha-top b {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 19px;
+      display: block
+    }
+
+    .ficha-top small {
+      color: var(--muted);
+      font-family: var(--mono)
+    }
+
+    .dl {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 18px;
+      margin-bottom: 20px
+    }
+
+    .dl>div {
+      display: flex;
+      flex-direction: column;
+      gap: 2px
+    }
+
+    .dl dt {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--faint);
+      font-weight: 600
+    }
+
+    .dl dd {
+      margin: 0;
+      font-weight: 500
+    }
+
+    .sect-title {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 14px;
+      margin: 22px 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .mini-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .mini-item {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 10px 12px;
+      font-size: 12.5px
+    }
+
+    .mini-item .mi-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 3px
+    }
+
+    .mini-item .mi-head b {
+      font-weight: 600
+    }
+
+    .mini-item .mi-date {
+      color: var(--faint);
+      font-family: var(--mono);
+      font-size: 11px
+    }
+
+    .mini-item p {
+      margin: 2px 0 0;
+      color: var(--muted)
+    }
+
+    .prest {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    .prest .pbox {
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 11px 12px
+    }
+
+    .prest .pbox .k {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--faint);
+      font-weight: 600
+    }
+
+    .prest .pbox .v {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+      margin-top: 3px
+    }
+
+    .prest-note {
+      font-size: 11px;
+      color: var(--faint);
+      margin-top: 8px;
+      grid-column: 1/-1
+    }
+
+    /* attendance grid */
+    .att-toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap
+    }
+
+    .att-toolbar input[type=date] {
+      padding: 8px 10px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: var(--surface)
+    }
+
+    .seg {
+      display: inline-flex;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      overflow: hidden
+    }
+
+    .seg button {
+      border: 0;
+      background: var(--surface);
+      padding: 7px 12px;
+      color: var(--muted);
+      font-weight: 500;
+      border-right: 1px solid var(--line)
+    }
+
+    .seg button:last-child {
+      border-right: 0
+    }
+
+    .seg button.on {
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+      font-weight: 600
+    }
+
+    .att-status-cell {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap
+    }
+
+    .chip {
+      border: 1px solid var(--line-strong);
+      background: var(--surface);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--muted)
+    }
+
+    .chip.on-presente {
+      background: var(--ok-soft);
+      color: var(--ok);
+      border-color: transparent
+    }
+
+    .chip.on-ausente {
+      background: var(--crit-soft);
+      color: var(--crit);
+      border-color: transparent
+    }
+
+    .chip.on-vacaciones {
+      background: var(--info-soft);
+      color: var(--info);
+      border-color: transparent
+    }
+
+    .chip.on-permiso {
+      background: var(--warn-soft);
+      color: var(--warn);
+      border-color: transparent
+    }
+
+    .chip.on-incapacidad {
+      background: var(--warn-soft);
+      color: var(--warn);
+      border-color: transparent
+    }
+
+    .chip.on-asueto {
+      background: var(--ground);
+      color: var(--muted);
+      border-color: transparent
+    }
+
+    .chip:not(.on-presente):not(.on-ausente):not(.on-vacaciones):not(.on-permiso):not(.on-incapacidad):not(.on-asueto):hover {
+      border-color: var(--accent);
+      color: var(--accent-ink)
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--ink);
+      color: var(--ground);
+      padding: 10px 18px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transition: .2s ease;
+      z-index: 60;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    .sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0)
+    }
+
+    @media (max-width:900px) {
+      .app {
+        grid-template-columns: 1fr
+      }
+
+      .side {
+        position: static;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        padding: 12px
+      }
+
+      .brand {
+        padding: 0 8px 0 4px
+      }
+
+      .nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin: 0
+      }
+
+      .nav .count {
+        display: none
+      }
+
+      .side .foot {
+        margin: 0 0 0 auto;
+        flex-direction: row
+      }
+
+      .side .foot small {
+        display: none
+      }
+
+      .main {
+        padding: 20px 16px 50px
+      }
+
+      .tiles {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr
+      }
+
+      .field-row {
+        grid-template-columns: 1fr
+      }
+
+      .dl {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      * {
+        transition: none !important
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="app">
-  <aside class="side">
-    <div class="brand">
-      <div class="mark" id="brandMark">RH</div>
-      <div>
-        <b id="brandName">Control de Personal</b>
-        <span id="brandBiz">Recursos Humanos</span>
+  <div class="app">
+    <aside class="side">
+      <div class="brand">
+        <div class="mark" id="brandMark">RH</div>
+        <div>
+          <b id="brandName">Control de Personal</b>
+          <span id="brandBiz">Recursos Humanos</span>
+        </div>
       </div>
-    </div>
-    <nav class="nav" id="nav">
-      <button data-view="panel" class="active"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Panel</button>
-      <button data-view="empleados"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Empleados<span class="count" data-count="empleados">0</span></button>
-      <button data-view="asistencia"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"/></svg>Asistencia</button>
-      <button data-view="ausencias"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M12 14v4M10 16h4"/></svg>Ausencias<span class="count" data-count="ausencias">0</span></button>
-      <button data-view="registros"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>Registros<span class="count" data-count="registros">0</span></button>
-    </nav>
-    <div class="foot">
-      <div class="foot-row">
-        <button class="themebtn" id="themeBtn" aria-label="Cambiar tema">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          <span id="themeLbl">Tema</span>
-        </button>
+      <nav class="nav" id="nav">
+        <button data-view="panel" class="active"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <rect x="3" y="3" width="7" height="9" />
+            <rect x="14" y="3" width="7" height="5" />
+            <rect x="14" y="12" width="7" height="9" />
+            <rect x="3" y="16" width="7" height="5" />
+          </svg>Panel</button>
+        <button data-view="empleados"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>Empleados<span class="count" data-count="empleados">0</span></button>
+        <button data-view="asistencia"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4" />
+          </svg>Asistencia</button>
+        <button data-view="ausencias"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M8 2v4M16 2v4M3 10h18" />
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <path d="M12 14v4M10 16h4" />
+          </svg>Ausencias<span class="count" data-count="ausencias">0</span></button>
+        <button data-view="registros"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+          </svg>Registros<span class="count" data-count="registros">0</span></button>
+      </nav>
+      <div class="foot">
+        <div class="foot-row">
+          <button class="themebtn" id="themeBtn" aria-label="Cambiar tema">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            <span id="themeLbl">Tema</span>
+          </button>
+        </div>
+        <div class="foot-row">
+          <button class="themebtn" id="exportBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+            </svg>
+            Exportar
+          </button>
+          <button class="themebtn" id="importBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 9l5-5 5 5M12 4v12" />
+            </svg>
+            Importar
+          </button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden>
+        </div>
+        <small id="storageNote">Los datos se guardan solo en este navegador. Usa <b>Exportar</b> para
+          respaldarlos.</small>
       </div>
-      <div class="foot-row">
-        <button class="themebtn" id="exportBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          Exportar
-        </button>
-        <button class="themebtn" id="importBtn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 9l5-5 5 5M12 4v12"/></svg>
-          Importar
-        </button>
-        <input type="file" id="importFile" accept="application/json,.json" hidden>
-      </div>
-      <small id="storageNote">Los datos se guardan solo en este navegador. Usa <b>Exportar</b> para respaldarlos.</small>
-    </div>
-  </aside>
+    </aside>
 
-  <main class="main" id="main"></main>
-</div>
+    <main class="main" id="main"></main>
+  </div>
 
-<div class="scrim" id="scrim"></div>
-<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle"></div>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="scrim" id="scrim"></div>
+  <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script>
-"use strict";
+  <script>
+    "use strict";
 
-/* ============ constantes ============ */
-const COLS = ["empleados","asistencia","ausencias","registros"];
-const DEPARTAMENTOS = ["Administración","Ventas","Operaciones","Bodega","Producción","Contabilidad","Atención al cliente","Recursos Humanos"];
-const CONTRATOS = ["Indefinido","Plazo fijo","Por obra","Aprendizaje","Servicios profesionales"];
-const ESTADOS_EMP = ["Activo","Suspendido","Inactivo"];
-const ASIST_ESTADOS = ["presente","ausente","vacaciones","permiso","incapacidad","asueto"];
-const AUS_TIPOS = ["Vacaciones","Permiso con goce","Permiso sin goce","Incapacidad IGSS","Suspensión","Licencia por maternidad","Otro"];
-const AUS_ESTADOS = ["Solicitada","Aprobada","Rechazada"];
-const REG_TIPOS = ["Contratación","Aumento salarial","Promoción","Amonestación","Felicitación","Capacitación","Cambio de puesto","Nota general","Finalización de contrato"];
-const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+    /* ============ constantes ============ */
+    const COLS = ["empleados", "asistencia", "ausencias", "registros"];
+    const DEPARTAMENTOS = ["Administración", "Ventas", "Operaciones", "Bodega", "Producción", "Contabilidad", "Atención al cliente", "Recursos Humanos"];
+    const CONTRATOS = ["Indefinido", "Plazo fijo", "Por obra", "Aprendizaje", "Servicios profesionales"];
+    const ESTADOS_EMP = ["Activo", "Suspendido", "Inactivo"];
+    const ASIST_ESTADOS = ["presente", "ausente", "vacaciones", "permiso", "incapacidad", "asueto"];
+    const AUS_TIPOS = ["Vacaciones", "Permiso con goce", "Permiso sin goce", "Incapacidad IGSS", "Suspensión", "Licencia por maternidad", "Otro"];
+    const AUS_ESTADOS = ["Solicitada", "Aprobada", "Rechazada"];
+    const REG_TIPOS = ["Contratación", "Aumento salarial", "Promoción", "Amonestación", "Felicitación", "Capacitación", "Cambio de puesto", "Nota general", "Finalización de contrato"];
+    const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 
-/* ============ estado ============ */
-const state = { empleados:[], asistencia:[], ausencias:[], registros:[] };
-let sampleMode = false;
-let view = "panel";
-const filters = { empQ:"", empDep:"", empEstado:"", ausEstado:"", regTipo:"", regEmp:"", attDate:todayISO(), attView:"dia" };
+    /* ============ estado ============ */
+    const state = { empleados: [], asistencia: [], ausencias: [], registros: [] };
+    let sampleMode = false;
+    let view = "panel";
+    const filters = { empQ: "", empDep: "", empEstado: "", ausEstado: "", regTipo: "", regEmp: "", attDate: todayISO(), attView: "dia" };
 
-/* ============ utilidades ============ */
-function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
-function $(sel,root){ return (root||document).querySelector(sel); }
-function el(tag,attrs,kids){
-  const n=document.createElement(tag);
-  if(attrs) for(const k in attrs){
-    if(k==="class") n.className=attrs[k];
-    else if(k==="html") n.innerHTML=attrs[k];
-    else if(k==="text") n.textContent=attrs[k];
-    else if(k.startsWith("on")) n.addEventListener(k.slice(2), attrs[k]);
-    else if(attrs[k]!=null) n.setAttribute(k, attrs[k]);
-  }
-  (kids||[]).forEach(c=>{ if(c==null) return; n.appendChild(typeof c==="string"?document.createTextNode(c):c); });
-  return n;
-}
-function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-function money(n){
-  const v = Number(n)||0;
-  return "Q " + v.toLocaleString("es-GT",{minimumFractionDigits:2, maximumFractionDigits:2});
-}
-function initials(name){
-  const p = String(name||"").trim().split(/\s+/).filter(Boolean);
-  const a = (p[0]||"")[0] || "";
-  const b = (p[1]||"")[0] || "";
-  return ((a + b) || "?").toUpperCase();
-}
-function fmtDate(iso){
-  if(!iso) return "—";
-  const d = new Date(iso+"T00:00:00");
-  if(isNaN(d)) return iso;
-  return `${d.getDate()} ${MESES[d.getMonth()].slice(0,3)} ${d.getFullYear()}`;
-}
-function yearsBetween(iso, to){
-  if(!iso) return 0;
-  const a = new Date(iso+"T00:00:00"), b = to?new Date(to+"T00:00:00"):new Date();
-  let y = b.getFullYear()-a.getFullYear();
-  const m = b.getMonth()-a.getMonth();
-  if(m<0 || (m===0 && b.getDate()<a.getDate())) y--;
-  return Math.max(0,y);
-}
-function monthsBetween(iso){
-  if(!iso) return 0;
-  const a=new Date(iso+"T00:00:00"), b=new Date();
-  return Math.max(0,(b.getFullYear()-a.getFullYear())*12 + (b.getMonth()-a.getMonth()));
-}
-function empById(id){ return state.empleados.find(e=>e.id===id); }
-function empName(id){ const e=empById(id); return e?e.nombre:"(empleado eliminado)"; }
-function activos(){ return state.empleados.filter(e=>e.estado==="Activo"); }
-function toast(msg){
-  const t=$("#toast"); t.textContent=msg; t.classList.add("show");
-  clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),2200);
-}
+    /* ============ utilidades ============ */
+    function todayISO() { const d = new Date(); return d.toISOString().slice(0, 10); }
+    function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+    function $(sel, root) { return (root || document).querySelector(sel); }
+    function el(tag, attrs, kids) {
+      const n = document.createElement(tag);
+      if (attrs) for (const k in attrs) {
+        if (k === "class") n.className = attrs[k];
+        else if (k === "html") n.innerHTML = attrs[k];
+        else if (k === "text") n.textContent = attrs[k];
+        else if (k.startsWith("on")) n.addEventListener(k.slice(2), attrs[k]);
+        else if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+      }
+      (kids || []).forEach(c => { if (c == null) return; n.appendChild(typeof c === "string" ? document.createTextNode(c) : c); });
+      return n;
+    }
+    function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+    function money(n) {
+      const v = Number(n) || 0;
+      return "Q " + v.toLocaleString("es-GT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    function initials(name) {
+      const p = String(name || "").trim().split(/\s+/).filter(Boolean);
+      const a = (p[0] || "")[0] || "";
+      const b = (p[1] || "")[0] || "";
+      return ((a + b) || "?").toUpperCase();
+    }
+    function fmtDate(iso) {
+      if (!iso) return "—";
+      const d = new Date(iso + "T00:00:00");
+      if (isNaN(d)) return iso;
+      return `${d.getDate()} ${MESES[d.getMonth()].slice(0, 3)} ${d.getFullYear()}`;
+    }
+    function yearsBetween(iso, to) {
+      if (!iso) return 0;
+      const a = new Date(iso + "T00:00:00"), b = to ? new Date(to + "T00:00:00") : new Date();
+      let y = b.getFullYear() - a.getFullYear();
+      const m = b.getMonth() - a.getMonth();
+      if (m < 0 || (m === 0 && b.getDate() < a.getDate())) y--;
+      return Math.max(0, y);
+    }
+    function monthsBetween(iso) {
+      if (!iso) return 0;
+      const a = new Date(iso + "T00:00:00"), b = new Date();
+      return Math.max(0, (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth()));
+    }
+    function empById(id) { return state.empleados.find(e => e.id === id); }
+    function empName(id) { const e = empById(id); return e ? e.nombre : "(empleado eliminado)"; }
+    function activos() { return state.empleados.filter(e => e.estado === "Activo"); }
+    function toast(msg) {
+      const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+      clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2200);
+    }
 
-/* ============ persistencia ============ */
-const LS_KEY = "rrhh_control_v1";
-function saveLocal(){
-  try{ localStorage.setItem(LS_KEY, JSON.stringify({ ...state, _sample:false })); }catch(e){}
-}
-function loadLocal(){
-  try{
-    const raw = localStorage.getItem(LS_KEY);
-    if(!raw) return false;
-    const d = JSON.parse(raw);
-    COLS.forEach(c=>{ state[c] = Array.isArray(d[c])?d[c]:[]; });
-    return COLS.some(c=>state[c].length);
-  }catch(e){ return false; }
-}
+    /* ============ persistencia ============ */
+    const LS_KEY = "rrhh_control_v1";
+    function saveLocal() {
+      try { localStorage.setItem(LS_KEY, JSON.stringify({ ...state, _sample: false })); } catch (e) { }
+    }
+    function loadLocal() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return false;
+        const d = JSON.parse(raw);
+        COLS.forEach(c => { state[c] = Array.isArray(d[c]) ? d[c] : []; });
+        return COLS.some(c => state[c].length);
+      } catch (e) { return false; }
+    }
 
-// Toda la información se guarda en este navegador (localStorage). No sale del
-// equipo ni se comparte automáticamente: haz respaldos con "Exportar datos".
-function persist(){ saveLocal(); }
-function persistDelete(){ saveLocal(); }
+    // Toda la información se guarda en este navegador (localStorage). No sale del
+    // equipo ni se comparte automáticamente: haz respaldos con "Exportar datos".
+    function persist() { saveLocal(); }
+    function persistDelete() { saveLocal(); }
 
-function exportData(){
-  const payload = JSON.stringify({ app:"control-de-personal", version:1, exportado:new Date().toISOString(), ...state }, null, 2);
-  const blob = new Blob([payload], {type:"application/json"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "control-personal-" + todayISO() + ".json";
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
-}
-function importData(file){
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    try{
-      const d = JSON.parse(reader.result);
-      if(!COLS.some(c=>Array.isArray(d[c]))) throw new Error("formato");
-      clearSamplesIfNeeded();
-      COLS.forEach(c=>{ state[c] = Array.isArray(d[c]) ? d[c] : []; });
+    function exportData() {
+      const payload = JSON.stringify({ app: "control-de-personal", version: 1, exportado: new Date().toISOString(), ...state }, null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "control-personal-" + todayISO() + ".json";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+    function importData(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const d = JSON.parse(reader.result);
+          if (!COLS.some(c => Array.isArray(d[c]))) throw new Error("formato");
+          clearSamplesIfNeeded();
+          COLS.forEach(c => { state[c] = Array.isArray(d[c]) ? d[c] : []; });
+          sampleMode = false;
+          saveLocal(); render();
+          toast("Datos importados correctamente.");
+        } catch (e) { toast("El archivo no tiene un formato válido."); }
+      };
+      reader.readAsText(file);
+    }
+
+    /* ============ datos de ejemplo ============ */
+    function loadSamples() {
+      sampleMode = true;
+      const E = (nombre, dpi, puesto, dep, ingreso, contrato, salario, tel, correo, nac, estado) => (
+        {
+          id: uid(), nombre, dpi, puesto, departamento: dep, fechaIngreso: ingreso, tipoContrato: contrato, salario,
+          telefono: tel, correo, direccion: "", fechaNacimiento: nac, emergenciaNombre: "", emergenciaTel: "", estado, notas: ""
+        });
+      state.empleados = [
+        E("María José Ramírez López", "2988 45012 0101", "Gerente de Ventas", "Ventas", "2021-03-15", "Indefinido", 9500, "5512 8890", "mramirez@ejemplo.gt", "1989-06-02", "Activo"),
+        E("Carlos Estuardo Mendoza", "1745 88123 0108", "Auxiliar de Bodega", "Bodega", "2023-08-01", "Plazo fijo", 3800, "4478 2201", "cmendoza@ejemplo.gt", "1996-11-20", "Activo"),
+        E("Ana Lucía Herrera", "3012 77654 0301", "Contadora General", "Contabilidad", "2020-01-20", "Indefinido", 8200, "5566 1122", "aherrera@ejemplo.gt", "1985-02-14", "Activo"),
+        E("José Roberto Xocop", "2211 33990 0901", "Operario de Producción", "Producción", "2022-05-10", "Indefinido", 3500, "3390 5544", "", "1994-09-30", "Activo"),
+        E("Diana Carolina Súchite", "2900 12388 0101", "Asistente Administrativa", "Administración", "2024-02-05", "Plazo fijo", 4200, "5901 7788", "dsuchite@ejemplo.gt", "1999-04-18", "Activo"),
+        E("Luis Fernando Barrios", "1988 55471 0114", "Vendedor de Ruta", "Ventas", "2019-07-22", "Indefinido", 4800, "4012 9963", "lbarrios@ejemplo.gt", "1990-12-08", "Suspendido"),
+      ];
+      const idOf = i => state.empleados[i].id;
+      state.ausencias = [
+        { id: uid(), empleadoId: idOf(1), tipo: "Vacaciones", inicio: addDays(7), fin: addDays(11), dias: 5, estado: "Solicitada", motivo: "Vacaciones anuales acumuladas." },
+        { id: uid(), empleadoId: idOf(3), tipo: "Incapacidad IGSS", inicio: addDays(-3), fin: addDays(1), dias: 5, estado: "Aprobada", motivo: "Suspensión por enfermedad común, certificada por IGSS." },
+        { id: uid(), empleadoId: idOf(4), tipo: "Permiso con goce", inicio: addDays(2), fin: addDays(2), dias: 1, estado: "Solicitada", motivo: "Trámite personal en RENAP." },
+      ];
+      state.registros = [
+        { id: uid(), empleadoId: idOf(0), fecha: "2024-03-15", tipo: "Aumento salarial", descripcion: "Ajuste salarial anual por desempeño: de Q8,800 a Q9,500." },
+        { id: uid(), empleadoId: idOf(2), fecha: "2023-11-30", tipo: "Felicitación", descripcion: "Reconocimiento por cierre contable sin observaciones de auditoría." },
+        { id: uid(), empleadoId: idOf(5), fecha: addDays(-10), tipo: "Amonestación", descripcion: "Llamada de atención escrita por inasistencias sin aviso." },
+        { id: uid(), empleadoId: idOf(1), fecha: "2023-08-01", tipo: "Contratación", descripcion: "Ingreso como Auxiliar de Bodega, contrato a plazo fijo de 1 año." },
+      ];
+      const t = todayISO();
+      state.asistencia = activos().slice(0, 4).map((e, i) => (
+        { id: uid(), empleadoId: e.id, fecha: t, estado: i === 3 ? "permiso" : "presente", entrada: i === 3 ? "" : "08:0" + i, salida: "", nota: "" }));
+    }
+    function addDays(n) { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+
+    function clearSamplesIfNeeded() {
+      if (!sampleMode) return;
       sampleMode = false;
+      COLS.forEach(c => state[c] = []);
+    }
+
+    /* ============ helpers de UI ============ */
+    function pageHead(title, subtitle, actionBtn) {
+      const h = el("div", { class: "page-head" });
+      const left = el("div", null, [el("h1", { text: title }), subtitle ? el("p", { text: subtitle }) : null]);
+      h.appendChild(left);
+      if (actionBtn) h.appendChild(actionBtn);
+      return h;
+    }
+    function estadoPill(estado) {
+      const map = { "Activo": "ok", "Suspendido": "warn", "Inactivo": "muted" };
+      return el("span", { class: "pill " + (map[estado] || "muted"), text: estado });
+    }
+    function ausPill(estado) {
+      const map = { "Solicitada": "warn", "Aprobada": "ok", "Rechazada": "crit" };
+      return el("span", { class: "pill " + (map[estado] || "muted"), text: estado });
+    }
+    function avatar(name) { return el("div", { class: "avatar", text: initials(name) }); }
+    function emptyState(icon, title, msg, btn) {
+      const box = el("div", { class: "empty" });
+      box.innerHTML = icon;
+      box.appendChild(el("b", { text: title }));
+      box.appendChild(el("div", { text: msg }));
+      if (btn) { const wrap = el("div", { style: "margin-top:14px" }); wrap.appendChild(btn); box.appendChild(wrap); }
+      return box;
+    }
+    const ICO_PEOPLE = '<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+
+    /* ============ render raíz ============ */
+    function render() {
+      document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+      document.querySelectorAll("[data-count]").forEach(c => { c.textContent = state[c.dataset.count].length; });
+      const main = $("#main");
+      main.innerHTML = "";
+      if (sampleMode) main.appendChild(sampleBanner());
+      ({
+        panel: renderPanel, empleados: renderEmpleados, asistencia: renderAsistencia,
+        ausencias: renderAusencias, registros: renderRegistros
+      }[view] || renderPanel)(main);
+    }
+    function sampleBanner() {
+      return el("div", { class: "banner" }, [
+        el("span", { html: "<b>Datos de ejemplo.</b> Estás viendo información de muestra para explorar la herramienta." }),
+        el("button", { text: "Empezar de cero", onclick: () => { clearSamplesIfNeeded(); saveLocal(); render(); toast("Listo, ya puedes registrar a tu equipo."); } })
+      ]);
+    }
+
+    /* ============ PANEL ============ */
+    function renderPanel(main) {
+      main.appendChild(pageHead("Panel general", hoyLargo(),
+        el("button", { class: "btn", onclick: () => openEmpForm() }, [plusIco(), "Nuevo empleado"])));
+
+      const act = activos();
+      const nomina = act.reduce((s, e) => s + (Number(e.salario) || 0), 0);
+      const hoy = todayISO();
+      const asistHoy = state.asistencia.filter(a => a.fecha === hoy);
+      const presentesHoy = asistHoy.filter(a => a.estado === "presente").length;
+      const pendientes = state.ausencias.filter(a => a.estado === "Solicitada").length;
+
+      const tiles = el("div", { class: "tiles" });
+      tiles.appendChild(tile("Empleados activos", act.length, state.empleados.length + " en total", true));
+      tiles.appendChild(tile("Nómina mensual", money(nomina), "Suma de salarios base activos"));
+      tiles.appendChild(tile("Asistencia de hoy", presentesHoy + " / " + act.length, asistHoy.length ? "Registrada" : "Sin registrar aún"));
+      tiles.appendChild(tile("Ausencias pendientes", pendientes, pendientes ? "Requieren tu aprobación" : "Todo al día"));
+      main.appendChild(tiles);
+
+      const grid = el("div", { class: "grid-2" });
+
+      // desglose por departamento
+      const depCard = el("div", { class: "card" });
+      depCard.appendChild(el("h2", null, ["Personal por departamento", el("span", { class: "tag", text: act.length + " activos" })]));
+      const counts = {};
+      act.forEach(e => { const d = e.departamento || "Sin asignar"; counts[d] = (counts[d] || 0) + 1; });
+      const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      const max = Math.max(1, ...entries.map(e => e[1]));
+      if (!entries.length) { depCard.appendChild(el("div", { class: "empty-mini", text: "Aún no hay empleados activos." })); }
+      else {
+        const bars = el("div", { class: "bars" });
+        entries.forEach(([d, n]) => {
+          bars.appendChild(el("div", { class: "bar-row" }, [
+            el("span", { class: "lbl", text: d }),
+            el("div", { class: "bar-track" }, [el("div", { class: "bar-fill", style: `width:${Math.round(n / max * 100)}%` })]),
+            el("span", { class: "n", text: n })
+          ]));
+        });
+        depCard.appendChild(bars);
+      }
+      grid.appendChild(depCard);
+
+      // alertas
+      const alCard = el("div", { class: "card" });
+      alCard.appendChild(el("h2", null, ["Avisos", el("span", { class: "tag", text: "este mes" })]));
+      const alerts = el("div", { class: "alerts" });
+      const items = buildAlerts();
+      if (!items.length) alerts.appendChild(el("div", { class: "empty-mini", text: "Sin avisos por ahora. Todo en orden." }));
+      items.forEach(it => {
+        alerts.appendChild(el("div", { class: "alert " + it.level }, [
+          el("div", { class: "dot" }),
+          el("div", { class: "txt" }, [el("b", { text: it.title }), el("span", { text: it.detail })])
+        ]));
+      });
+      alCard.appendChild(alerts);
+      grid.appendChild(alCard);
+
+      main.appendChild(grid);
+    }
+    function tile(k, v, s, accent) {
+      return el("div", { class: "tile" + (accent ? " accent" : "") }, [
+        el("div", { class: "k", text: k }), el("div", { class: "v", text: v }), el("div", { class: "s", text: s })
+      ]);
+    }
+    function hoyLargo() {
+      const d = new Date();
+      return `Hoy es ${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`;
+    }
+    function buildAlerts() {
+      const out = [];
+      const now = new Date(), mes = now.getMonth();
+      // aniversarios laborales este mes -> nuevas vacaciones
+      state.empleados.filter(e => e.estado === "Activo" && e.fechaIngreso).forEach(e => {
+        const d = new Date(e.fechaIngreso + "T00:00:00");
+        if (d.getMonth() === mes) {
+          const anios = now.getFullYear() - d.getFullYear();
+          if (anios >= 1) out.push({
+            level: "info", title: `Aniversario laboral · ${e.nombre}`,
+            detail: `Cumple ${anios} año(s) el ${d.getDate()} de ${MESES[mes]}. Le corresponden 15 días de vacaciones.`
+          });
+        }
+      });
+      // cumpleaños este mes
+      state.empleados.filter(e => e.estado === "Activo" && e.fechaNacimiento).forEach(e => {
+        const d = new Date(e.fechaNacimiento + "T00:00:00");
+        if (d.getMonth() === mes) out.push({
+          level: "info", title: `Cumpleaños · ${e.nombre}`,
+          detail: `${d.getDate()} de ${MESES[mes]}.`
+        });
+      });
+      // ausencias solicitadas
+      state.ausencias.filter(a => a.estado === "Solicitada").forEach(a => {
+        out.push({
+          level: "warn", title: `Ausencia por aprobar · ${empName(a.empleadoId)}`,
+          detail: `${a.tipo}, ${a.dias || "?"} día(s) desde el ${fmtDate(a.inicio)}.`
+        });
+      });
+      // contratos a plazo fijo
+      state.empleados.filter(e => e.estado === "Activo" && e.tipoContrato === "Plazo fijo").forEach(e => {
+        out.push({
+          level: "warn", title: `Contrato a plazo fijo · ${e.nombre}`,
+          detail: `Revisa la fecha de vencimiento y si corresponde renovar o pasar a indefinido.`
+        });
+      });
+      // datos incompletos
+      const sinDpi = state.empleados.filter(e => e.estado === "Activo" && !e.dpi).length;
+      if (sinDpi) out.push({
+        level: "crit", title: `${sinDpi} empleado(s) sin DPI registrado`,
+        detail: `Completa el Documento Personal de Identificación para el expediente.`
+      });
+      return out.slice(0, 12);
+    }
+    function plusIco() { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("width", "15"); s.setAttribute("height", "15"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("fill", "none"); s.setAttribute("stroke", "currentColor"); s.setAttribute("stroke-width", "2.5"); s.innerHTML = '<path d="M12 5v14M5 12h14"/>'; return s; }
+
+    const EDIT_ICO = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+    const DEL_ICO = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>';
+
+    function tableWrap(headCells, rows) {
+      const wrap = el("div", { class: "table-wrap" });
+      const t = el("table");
+      const thead = el("thead"); const trh = el("tr");
+      headCells.forEach(h => trh.appendChild(el("th", { text: h })));
+      thead.appendChild(trh); t.appendChild(thead);
+      const tb = el("tbody");
+      rows.forEach(r => tb.appendChild(r));
+      t.appendChild(tb); wrap.appendChild(t);
+      return wrap;
+    }
+    function confirmDelete(msg, fn) {
+      if (window.confirm(msg)) fn();
+    }
+
+    /* ============ EMPLEADOS ============ */
+    function renderEmpleados(main) {
+      main.appendChild(pageHead("Empleados", "Expediente del personal de tu empresa",
+        el("button", { class: "btn", onclick: () => openEmpForm() }, [plusIco(), "Nuevo empleado"])));
+
+      const bar = el("div", { class: "toolbar" });
+      const search = el("div", { class: "search" });
+      search.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>';
+      const inp = el("input", {
+        type: "search", placeholder: "Buscar por nombre, puesto o DPI…", value: filters.empQ,
+        oninput: e => { filters.empQ = e.target.value; refreshEmpTable(); }
+      });
+      search.appendChild(inp);
+      bar.appendChild(search);
+      const fil = el("div", { class: "filters" });
+      fil.appendChild(selectFilter(["", "Todos los departamentos", ...DEPARTAMENTOS], filters.empDep, v => { filters.empDep = v; refreshEmpTable(); }, "Todos los departamentos"));
+      fil.appendChild(selectFilter(["", "Todos los estados", ...ESTADOS_EMP], filters.empEstado, v => { filters.empEstado = v; refreshEmpTable(); }, "Todos los estados"));
+      bar.appendChild(fil);
+      main.appendChild(bar);
+
+      main.appendChild(el("div", { id: "empTableHost" }));
+      refreshEmpTable();
+    }
+    function selectFilter(opts, val, onchange, allLabel) {
+      const s = el("select", { onchange: e => onchange(e.target.value) });
+      opts.forEach((o, i) => {
+        if (i === 0) s.appendChild(el("option", { value: "", text: allLabel || "Todos" }));
+        else if (i === 1) return;
+        else s.appendChild(el("option", { value: o, text: o, selected: o === val ? "selected" : null }));
+      });
+      s.value = val || "";
+      return s;
+    }
+    function empFiltered() {
+      const q = filters.empQ.trim().toLowerCase();
+      return state.empleados.filter(e => {
+        if (filters.empDep && e.departamento !== filters.empDep) return false;
+        if (filters.empEstado && e.estado !== filters.empEstado) return false;
+        if (q) {
+          const hay = (e.nombre + " " + e.puesto + " " + (e.dpi || "") + " " + (e.correo || "")).toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      }).sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+    }
+    function refreshEmpTable() {
+      const host = $("#empTableHost"); if (!host) return;
+      host.innerHTML = "";
+      const list = empFiltered();
+      if (!state.empleados.length) {
+        host.appendChild(emptyState(ICO_PEOPLE, "Todavía no hay empleados",
+          "Registra a tu primer colaborador para llevar su expediente, asistencia e historial.",
+          el("button", { class: "btn", onclick: () => openEmpForm() }, [plusIco(), "Nuevo empleado"])));
+        return;
+      }
+      if (!list.length) { host.appendChild(el("div", { class: "empty", html: "<b>Sin resultados</b><div>Ajusta la búsqueda o los filtros.</div>" })); return; }
+      const rows = list.map(e => {
+        const tr = el("tr", { class: "clickable", onclick: () => openFicha(e.id) });
+        tr.appendChild(el("td", null, [el("div", { class: "cell-name" }, [
+          avatar(e.nombre),
+          el("div", null, [el("b", { text: e.nombre }), el("small", { text: e.dpi || "Sin DPI" })])
+        ])]));
+        tr.appendChild(el("td", null, [el("div", null, [document.createTextNode(e.puesto || "—"),
+        el("div", { class: "sub", text: e.tipoContrato || "" })])]));
+        tr.appendChild(el("td", { text: e.departamento || "—" }));
+        tr.appendChild(el("td", { class: "num", text: fmtDate(e.fechaIngreso) }));
+        tr.appendChild(el("td", { class: "num", text: money(e.salario) }));
+        tr.appendChild(el("td", null, [estadoPill(e.estado)]));
+        const act = el("td", null, [el("div", { class: "row-actions" }, [
+          el("button", {
+            class: "icon-btn", title: "Editar", "aria-label": "Editar", html: EDIT_ICO,
+            onclick: ev => { ev.stopPropagation(); openEmpForm(e.id); }
+          }),
+          el("button", {
+            class: "icon-btn", title: "Eliminar", "aria-label": "Eliminar", html: DEL_ICO,
+            onclick: ev => { ev.stopPropagation(); confirmDelete(`¿Eliminar a ${e.nombre}? También se quitan sus registros de asistencia, ausencias e historial.`, () => deleteEmpleado(e.id)); }
+          })
+        ])]);
+        tr.appendChild(act);
+        return tr;
+      });
+      host.appendChild(tableWrap(["Empleado", "Puesto", "Departamento", "Ingreso", "Salario base", "Estado", ""], rows));
+    }
+
+    /* ============ AUSENCIAS ============ */
+    function renderAusencias(main) {
+      main.appendChild(pageHead("Ausencias y permisos", "Vacaciones, incapacidades IGSS, permisos y suspensiones",
+        el("button", { class: "btn", onclick: () => openAusForm() }, [plusIco(), "Registrar ausencia"])));
+      const bar = el("div", { class: "toolbar" });
+      bar.appendChild(selectFilter(["", "x", ...AUS_ESTADOS], filters.ausEstado, v => { filters.ausEstado = v; render(); }, "Todos los estados"));
+      main.appendChild(bar);
+
+      let list = state.ausencias.slice().sort((a, b) => (b.inicio || "").localeCompare(a.inicio || ""));
+      if (filters.ausEstado) list = list.filter(a => a.estado === filters.ausEstado);
+
+      if (!state.ausencias.length) {
+        main.appendChild(emptyState(ICO_PEOPLE, "Sin ausencias registradas",
+          "Anota vacaciones, permisos e incapacidades para llevar el control de días.",
+          el("button", { class: "btn", onclick: () => openAusForm() }, [plusIco(), "Registrar ausencia"])));
+        return;
+      }
+      const rows = list.map(a => {
+        const tr = el("tr");
+        tr.appendChild(el("td", null, [el("div", { class: "cell-name" }, [avatar(empName(a.empleadoId)), el("div", null, [el("b", { text: empName(a.empleadoId) })])])]));
+        tr.appendChild(el("td", { text: a.tipo }));
+        tr.appendChild(el("td", { class: "num", text: fmtDate(a.inicio) + " → " + fmtDate(a.fin) }));
+        tr.appendChild(el("td", { class: "num", text: (a.dias || "—") + "" }));
+        tr.appendChild(el("td", null, [ausPill(a.estado)]));
+        tr.appendChild(el("td", null, [el("div", { class: "row-actions" }, [
+          a.estado === "Solicitada" ? el("button", { class: "btn sm", text: "Aprobar", onclick: () => setAusEstado(a.id, "Aprobada") }) : null,
+          a.estado === "Solicitada" ? el("button", { class: "btn sm ghost", text: "Rechazar", onclick: () => setAusEstado(a.id, "Rechazada") }) : null,
+          el("button", { class: "icon-btn", title: "Editar", html: EDIT_ICO, onclick: () => openAusForm(a.id) }),
+          el("button", { class: "icon-btn", title: "Eliminar", html: DEL_ICO, onclick: () => confirmDelete("¿Eliminar esta ausencia?", () => deleteRow("ausencias", a.id)) })
+        ])]));
+        return tr;
+      });
+      main.appendChild(tableWrap(["Empleado", "Tipo", "Período", "Días", "Estado", ""], rows));
+    }
+
+    /* ============ REGISTROS ============ */
+    function renderRegistros(main) {
+      main.appendChild(pageHead("Registros e historial", "Contrataciones, aumentos, amonestaciones, capacitaciones y notas",
+        el("button", { class: "btn", onclick: () => openRegForm() }, [plusIco(), "Nuevo registro"])));
+      const bar = el("div", { class: "toolbar" });
+      const empSel = el("select", { onchange: e => { filters.regEmp = e.target.value; render(); } });
+      empSel.appendChild(el("option", { value: "", text: "Todos los empleados" }));
+      state.empleados.slice().sort((a, b) => a.nombre.localeCompare(b.nombre, "es")).forEach(e => empSel.appendChild(el("option", { value: e.id, text: e.nombre, selected: e.id === filters.regEmp ? "selected" : null })));
+      bar.appendChild(empSel);
+      bar.appendChild(selectFilter(["", "x", ...REG_TIPOS], filters.regTipo, v => { filters.regTipo = v; render(); }, "Todos los tipos"));
+      main.appendChild(bar);
+
+      let list = state.registros.slice().sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+      if (filters.regEmp) list = list.filter(r => r.empleadoId === filters.regEmp);
+      if (filters.regTipo) list = list.filter(r => r.tipo === filters.regTipo);
+
+      if (!state.registros.length) {
+        main.appendChild(emptyState(ICO_PEOPLE, "Sin registros en el historial",
+          "Documenta hechos importantes del personal: aumentos, promociones, amonestaciones o capacitaciones.",
+          el("button", { class: "btn", onclick: () => openRegForm() }, [plusIco(), "Nuevo registro"])));
+        return;
+      }
+      const rows = list.map(r => {
+        const tr = el("tr");
+        tr.appendChild(el("td", { class: "num", text: fmtDate(r.fecha) }));
+        tr.appendChild(el("td", null, [el("div", { class: "cell-name" }, [avatar(empName(r.empleadoId)), el("div", null, [el("b", { text: empName(r.empleadoId) })])])]));
+        tr.appendChild(el("td", null, [el("span", { class: "pill plain", text: r.tipo })]));
+        tr.appendChild(el("td", null, [el("div", { class: "sub", text: r.descripcion, style: "color:var(--ink);max-width:420px" })]));
+        tr.appendChild(el("td", null, [el("div", { class: "row-actions" }, [
+          el("button", { class: "icon-btn", title: "Editar", html: EDIT_ICO, onclick: () => openRegForm(r.id) }),
+          el("button", { class: "icon-btn", title: "Eliminar", html: DEL_ICO, onclick: () => confirmDelete("¿Eliminar este registro del historial?", () => deleteRow("registros", r.id)) })
+        ])]));
+        return tr;
+      });
+      main.appendChild(tableWrap(["Fecha", "Empleado", "Tipo", "Descripción", ""], rows));
+    }
+
+    /* ============ ASISTENCIA ============ */
+    function renderAsistencia(main) {
+      main.appendChild(pageHead("Asistencia diaria", "Marca la asistencia del personal activo por día"));
+      const bar = el("div", { class: "att-toolbar" });
+      const dateInp = el("input", { type: "date", value: filters.attDate, max: todayISO(), onchange: e => { filters.attDate = e.target.value || todayISO(); render(); } });
+      bar.appendChild(el("label", { class: "eyebrow", text: "Fecha" }));
+      bar.appendChild(dateInp);
+      bar.appendChild(el("button", { class: "btn ghost sm", text: "Hoy", onclick: () => { filters.attDate = todayISO(); render(); } }));
+      bar.appendChild(el("button", { class: "btn sm", text: "Marcar a todos presentes", onclick: () => markAllPresent() }));
+      main.appendChild(bar);
+
+      const act = activos();
+      if (!act.length) {
+        main.appendChild(emptyState(ICO_PEOPLE, "No hay empleados activos", "Registra empleados con estado Activo para marcar su asistencia."));
+        return;
+      }
+      const dayRecs = {};
+      state.asistencia.filter(a => a.fecha === filters.attDate).forEach(a => { dayRecs[a.empleadoId] = a; });
+      const rows = act.slice().sort((a, b) => a.nombre.localeCompare(b.nombre, "es")).map(e => {
+        const rec = dayRecs[e.id];
+        const tr = el("tr");
+        tr.appendChild(el("td", null, [el("div", { class: "cell-name" }, [avatar(e.nombre), el("div", null, [el("b", { text: e.nombre }), el("small", { text: e.puesto || "" })])])]));
+        const cell = el("td");
+        const chips = el("div", { class: "att-status-cell" });
+        ASIST_ESTADOS.forEach(st => {
+          const on = rec && rec.estado === st;
+          chips.appendChild(el("button", {
+            class: "chip" + (on ? " on-" + st : ""), text: st[0].toUpperCase() + st.slice(1),
+            onclick: () => setAsistencia(e.id, on ? null : st)
+          }));
+        });
+        cell.appendChild(chips);
+        tr.appendChild(cell);
+        // horario
+        const hcell = el("td", { class: "num" });
+        if (rec && rec.estado === "presente") {
+          const t1 = el("input", {
+            type: "time", value: rec.entrada || "", style: "padding:5px 7px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface-2);width:100px",
+            onchange: ev => updateAsistencia(rec.id, { entrada: ev.target.value })
+          });
+          const t2 = el("input", {
+            type: "time", value: rec.salida || "", style: "padding:5px 7px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface-2);width:100px;margin-left:6px",
+            onchange: ev => updateAsistencia(rec.id, { salida: ev.target.value })
+          });
+          hcell.appendChild(t1); hcell.appendChild(t2);
+        } else { hcell.appendChild(el("span", { class: "sub", text: "—" })); }
+        tr.appendChild(hcell);
+        return tr;
+      });
+      main.appendChild(tableWrap(["Empleado", "Estado del día", "Entrada / Salida"], rows));
+
+      const dd = new Date(filters.attDate + "T00:00:00");
+      const resumen = {};
+      ASIST_ESTADOS.forEach(s => resumen[s] = 0);
+      Object.values(dayRecs).forEach(r => { if (resumen[r.estado] != null) resumen[r.estado]++; });
+      const sinMarcar = act.length - Object.keys(dayRecs).length;
+      main.appendChild(el("p", {
+        class: "sub", style: "margin-top:14px;color:var(--muted)",
+        text: `${MESES[dd.getMonth()]} ${dd.getDate()}: ${resumen.presente} presentes · ${resumen.ausente} ausentes · ${resumen.vacaciones} vacaciones · ${resumen.permiso + resumen.incapacidad} permisos/incapacidad · ${sinMarcar} sin marcar`
+      }));
+    }
+
+    /* ============ mutaciones ============ */
+    function upsert(col, obj) {
+      clearSamplesIfNeeded();
+      const arr = state[col];
+      const i = arr.findIndex(x => x.id === obj.id);
+      if (i >= 0) arr[i] = obj; else arr.push(obj);
+      persist(col, obj);
+      saveLocal();
+      render();
+    }
+    function deleteRow(col, id) {
+      state[col] = state[col].filter(x => x.id !== id);
+      persistDelete(col, id);
+      saveLocal();
+      render();
+      toast("Eliminado.");
+    }
+    function deleteEmpleado(id) {
+      state.empleados = state.empleados.filter(e => e.id !== id);
+      ["asistencia", "ausencias", "registros"].forEach(col => {
+        state[col].filter(x => x.empleadoId === id).forEach(x => persistDelete(col, x.id));
+        state[col] = state[col].filter(x => x.empleadoId !== id);
+      });
+      persistDelete("empleados", id);
+      saveLocal(); render(); closeDrawer();
+      toast("Empleado eliminado.");
+    }
+    function setAusEstado(id, estado) {
+      const a = state.ausencias.find(x => x.id === id); if (!a) return;
+      a.estado = estado; persist("ausencias", a); saveLocal(); render();
+      toast(estado === "Aprobada" ? "Ausencia aprobada." : "Ausencia rechazada.");
+    }
+    function setAsistencia(empId, estado) {
+      clearSamplesIfNeeded();
+      const rec = state.asistencia.find(a => a.empleadoId === empId && a.fecha === filters.attDate);
+      if (estado == null) {
+        if (rec) { deleteRow("asistencia", rec.id); }
+        return;
+      }
+      if (rec) { rec.estado = estado; if (estado !== "presente") { rec.entrada = ""; rec.salida = ""; } persist("asistencia", rec); }
+      else {
+        const nrec = { id: uid(), empleadoId: empId, fecha: filters.attDate, estado, entrada: "", salida: "", nota: "" };
+        state.asistencia.push(nrec); persist("asistencia", nrec);
+      }
       saveLocal(); render();
-      toast("Datos importados correctamente.");
-    }catch(e){ toast("El archivo no tiene un formato válido."); }
-  };
-  reader.readAsText(file);
-}
+    }
+    function updateAsistencia(id, patch) {
+      const rec = state.asistencia.find(a => a.id === id); if (!rec) return;
+      Object.assign(rec, patch); persist("asistencia", rec); saveLocal();
+    }
+    function markAllPresent() {
+      clearSamplesIfNeeded();
+      activos().forEach(e => {
+        let rec = state.asistencia.find(a => a.empleadoId === e.id && a.fecha === filters.attDate);
+        if (!rec) { rec = { id: uid(), empleadoId: e.id, fecha: filters.attDate, estado: "presente", entrada: "", salida: "", nota: "" }; state.asistencia.push(rec); }
+        else rec.estado = "presente";
+        persist("asistencia", rec);
+      });
+      saveLocal(); render(); toast("Todos marcados como presentes.");
+    }
 
-/* ============ datos de ejemplo ============ */
-function loadSamples(){
-  sampleMode = true;
-  const E = (nombre,dpi,puesto,dep,ingreso,contrato,salario,tel,correo,nac,estado)=>(
-    {id:uid(),nombre,dpi,puesto,departamento:dep,fechaIngreso:ingreso,tipoContrato:contrato,salario,
-     telefono:tel,correo,direccion:"",fechaNacimiento:nac,emergenciaNombre:"",emergenciaTel:"",estado,notas:""});
-  state.empleados = [
-    E("María José Ramírez López","2988 45012 0101","Gerente de Ventas","Ventas","2021-03-15","Indefinido",9500,"5512 8890","mramirez@ejemplo.gt","1989-06-02","Activo"),
-    E("Carlos Estuardo Mendoza","1745 88123 0108","Auxiliar de Bodega","Bodega","2023-08-01","Plazo fijo",3800,"4478 2201","cmendoza@ejemplo.gt","1996-11-20","Activo"),
-    E("Ana Lucía Herrera","3012 77654 0301","Contadora General","Contabilidad","2020-01-20","Indefinido",8200,"5566 1122","aherrera@ejemplo.gt","1985-02-14","Activo"),
-    E("José Roberto Xocop","2211 33990 0901","Operario de Producción","Producción","2022-05-10","Indefinido",3500,"3390 5544","","1994-09-30","Activo"),
-    E("Diana Carolina Súchite","2900 12388 0101","Asistente Administrativa","Administración","2024-02-05","Plazo fijo",4200,"5901 7788","dsuchite@ejemplo.gt","1999-04-18","Activo"),
-    E("Luis Fernando Barrios","1988 55471 0114","Vendedor de Ruta","Ventas","2019-07-22","Indefinido",4800,"4012 9963","lbarrios@ejemplo.gt","1990-12-08","Suspendido"),
-  ];
-  const idOf = i => state.empleados[i].id;
-  state.ausencias = [
-    {id:uid(),empleadoId:idOf(1),tipo:"Vacaciones",inicio:addDays(7),fin:addDays(11),dias:5,estado:"Solicitada",motivo:"Vacaciones anuales acumuladas."},
-    {id:uid(),empleadoId:idOf(3),tipo:"Incapacidad IGSS",inicio:addDays(-3),fin:addDays(1),dias:5,estado:"Aprobada",motivo:"Suspensión por enfermedad común, certificada por IGSS."},
-    {id:uid(),empleadoId:idOf(4),tipo:"Permiso con goce",inicio:addDays(2),fin:addDays(2),dias:1,estado:"Solicitada",motivo:"Trámite personal en RENAP."},
-  ];
-  state.registros = [
-    {id:uid(),empleadoId:idOf(0),fecha:"2024-03-15",tipo:"Aumento salarial",descripcion:"Ajuste salarial anual por desempeño: de Q8,800 a Q9,500."},
-    {id:uid(),empleadoId:idOf(2),fecha:"2023-11-30",tipo:"Felicitación",descripcion:"Reconocimiento por cierre contable sin observaciones de auditoría."},
-    {id:uid(),empleadoId:idOf(5),fecha:addDays(-10),tipo:"Amonestación",descripcion:"Llamada de atención escrita por inasistencias sin aviso."},
-    {id:uid(),empleadoId:idOf(1),fecha:"2023-08-01",tipo:"Contratación",descripcion:"Ingreso como Auxiliar de Bodega, contrato a plazo fijo de 1 año."},
-  ];
-  const t = todayISO();
-  state.asistencia = activos().slice(0,4).map((e,i)=>(
-    {id:uid(),empleadoId:e.id,fecha:t,estado:i===3?"permiso":"presente",entrada:i===3?"":"08:0"+i,salida:"",nota:""}));
-}
-function addDays(n){ const d=new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
-
-function clearSamplesIfNeeded(){
-  if(!sampleMode) return;
-  sampleMode = false;
-  COLS.forEach(c=>state[c]=[]);
-}
-
-/* ============ helpers de UI ============ */
-function pageHead(title, subtitle, actionBtn){
-  const h = el("div",{class:"page-head"});
-  const left = el("div",null,[ el("h1",{text:title}), subtitle?el("p",{text:subtitle}):null ]);
-  h.appendChild(left);
-  if(actionBtn) h.appendChild(actionBtn);
-  return h;
-}
-function estadoPill(estado){
-  const map = { "Activo":"ok", "Suspendido":"warn", "Inactivo":"muted" };
-  return el("span",{class:"pill "+(map[estado]||"muted"), text:estado});
-}
-function ausPill(estado){
-  const map = { "Solicitada":"warn", "Aprobada":"ok", "Rechazada":"crit" };
-  return el("span",{class:"pill "+(map[estado]||"muted"), text:estado});
-}
-function avatar(name){ return el("div",{class:"avatar", text:initials(name)}); }
-function emptyState(icon, title, msg, btn){
-  const box = el("div",{class:"empty"});
-  box.innerHTML = icon;
-  box.appendChild(el("b",{text:title}));
-  box.appendChild(el("div",{text:msg}));
-  if(btn){ const wrap=el("div",{style:"margin-top:14px"}); wrap.appendChild(btn); box.appendChild(wrap); }
-  return box;
-}
-const ICO_PEOPLE = '<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
-
-/* ============ render raíz ============ */
-function render(){
-  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active", b.dataset.view===view));
-  document.querySelectorAll("[data-count]").forEach(c=>{ c.textContent = state[c.dataset.count].length; });
-  const main = $("#main");
-  main.innerHTML = "";
-  if(sampleMode) main.appendChild(sampleBanner());
-  ({ panel:renderPanel, empleados:renderEmpleados, asistencia:renderAsistencia,
-     ausencias:renderAusencias, registros:renderRegistros }[view] || renderPanel)(main);
-}
-function sampleBanner(){
-  return el("div",{class:"banner"},[
-    el("span",{html:"<b>Datos de ejemplo.</b> Estás viendo información de muestra para explorar la herramienta."}),
-    el("button",{text:"Empezar de cero", onclick:()=>{ clearSamplesIfNeeded(); saveLocal(); render(); toast("Listo, ya puedes registrar a tu equipo."); }})
-  ]);
-}
-
-/* ============ PANEL ============ */
-function renderPanel(main){
-  main.appendChild(pageHead("Panel general", hoyLargo(),
-    el("button",{class:"btn", onclick:()=>openEmpForm()},[plusIco(),"Nuevo empleado"])));
-
-  const act = activos();
-  const nomina = act.reduce((s,e)=>s+(Number(e.salario)||0),0);
-  const hoy = todayISO();
-  const asistHoy = state.asistencia.filter(a=>a.fecha===hoy);
-  const presentesHoy = asistHoy.filter(a=>a.estado==="presente").length;
-  const pendientes = state.ausencias.filter(a=>a.estado==="Solicitada").length;
-
-  const tiles = el("div",{class:"tiles"});
-  tiles.appendChild(tile("Empleados activos", act.length, state.empleados.length+" en total", true));
-  tiles.appendChild(tile("Nómina mensual", money(nomina), "Suma de salarios base activos"));
-  tiles.appendChild(tile("Asistencia de hoy", presentesHoy + " / " + act.length, asistHoy.length? "Registrada" : "Sin registrar aún"));
-  tiles.appendChild(tile("Ausencias pendientes", pendientes, pendientes? "Requieren tu aprobación" : "Todo al día"));
-  main.appendChild(tiles);
-
-  const grid = el("div",{class:"grid-2"});
-
-  // desglose por departamento
-  const depCard = el("div",{class:"card"});
-  depCard.appendChild(el("h2",null,[ "Personal por departamento", el("span",{class:"tag", text:act.length+" activos"}) ]));
-  const counts = {};
-  act.forEach(e=>{ const d=e.departamento||"Sin asignar"; counts[d]=(counts[d]||0)+1; });
-  const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
-  const max = Math.max(1,...entries.map(e=>e[1]));
-  if(!entries.length){ depCard.appendChild(el("div",{class:"empty-mini", text:"Aún no hay empleados activos."})); }
-  else{
-    const bars = el("div",{class:"bars"});
-    entries.forEach(([d,n])=>{
-      bars.appendChild(el("div",{class:"bar-row"},[
-        el("span",{class:"lbl", text:d}),
-        el("div",{class:"bar-track"},[ el("div",{class:"bar-fill", style:`width:${Math.round(n/max*100)}%`}) ]),
-        el("span",{class:"n", text:n})
+    /* ============ drawer ============ */
+    function openDrawer(title, eyebrow, bodyNode, footNode) {
+      const d = $("#drawer");
+      d.innerHTML = "";
+      d.appendChild(el("div", { class: "drawer-head" }, [
+        el("div", null, [el("div", { class: "eyebrow", text: eyebrow || "" }), el("h2", { id: "drawerTitle", text: title })]),
+        el("button", { class: "x", "aria-label": "Cerrar", html: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>', onclick: closeDrawer })
       ]));
-    });
-    depCard.appendChild(bars);
-  }
-  grid.appendChild(depCard);
-
-  // alertas
-  const alCard = el("div",{class:"card"});
-  alCard.appendChild(el("h2",null,[ "Avisos", el("span",{class:"tag", text:"este mes"}) ]));
-  const alerts = el("div",{class:"alerts"});
-  const items = buildAlerts();
-  if(!items.length) alerts.appendChild(el("div",{class:"empty-mini", text:"Sin avisos por ahora. Todo en orden."}));
-  items.forEach(it=>{
-    alerts.appendChild(el("div",{class:"alert "+it.level},[
-      el("div",{class:"dot"}),
-      el("div",{class:"txt"},[ el("b",{text:it.title}), el("span",{text:it.detail}) ])
-    ]));
-  });
-  alCard.appendChild(alerts);
-  grid.appendChild(alCard);
-
-  main.appendChild(grid);
-}
-function tile(k,v,s,accent){
-  return el("div",{class:"tile"+(accent?" accent":"")},[
-    el("div",{class:"k", text:k}), el("div",{class:"v", text:v}), el("div",{class:"s", text:s})
-  ]);
-}
-function hoyLargo(){
-  const d=new Date();
-  return `Hoy es ${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`;
-}
-function buildAlerts(){
-  const out = [];
-  const now = new Date(), mes = now.getMonth();
-  // aniversarios laborales este mes -> nuevas vacaciones
-  state.empleados.filter(e=>e.estado==="Activo" && e.fechaIngreso).forEach(e=>{
-    const d = new Date(e.fechaIngreso+"T00:00:00");
-    if(d.getMonth()===mes){
-      const anios = now.getFullYear()-d.getFullYear();
-      if(anios>=1) out.push({level:"info", title:`Aniversario laboral · ${e.nombre}`,
-        detail:`Cumple ${anios} año(s) el ${d.getDate()} de ${MESES[mes]}. Le corresponden 15 días de vacaciones.`});
+      d.appendChild(el("div", { class: "drawer-body" }, [bodyNode]));
+      if (footNode) d.appendChild(el("div", { class: "drawer-foot" }, [footNode]));
+      d.classList.add("open");
+      $("#scrim").classList.add("open");
+      document.body.style.overflow = "hidden";
     }
-  });
-  // cumpleaños este mes
-  state.empleados.filter(e=>e.estado==="Activo" && e.fechaNacimiento).forEach(e=>{
-    const d = new Date(e.fechaNacimiento+"T00:00:00");
-    if(d.getMonth()===mes) out.push({level:"info", title:`Cumpleaños · ${e.nombre}`,
-      detail:`${d.getDate()} de ${MESES[mes]}.`});
-  });
-  // ausencias solicitadas
-  state.ausencias.filter(a=>a.estado==="Solicitada").forEach(a=>{
-    out.push({level:"warn", title:`Ausencia por aprobar · ${empName(a.empleadoId)}`,
-      detail:`${a.tipo}, ${a.dias||"?"} día(s) desde el ${fmtDate(a.inicio)}.`});
-  });
-  // contratos a plazo fijo
-  state.empleados.filter(e=>e.estado==="Activo" && e.tipoContrato==="Plazo fijo").forEach(e=>{
-    out.push({level:"warn", title:`Contrato a plazo fijo · ${e.nombre}`,
-      detail:`Revisa la fecha de vencimiento y si corresponde renovar o pasar a indefinido.`});
-  });
-  // datos incompletos
-  const sinDpi = state.empleados.filter(e=>e.estado==="Activo" && !e.dpi).length;
-  if(sinDpi) out.push({level:"crit", title:`${sinDpi} empleado(s) sin DPI registrado`,
-    detail:`Completa el Documento Personal de Identificación para el expediente.`});
-  return out.slice(0,12);
-}
-function plusIco(){ const s=document.createElementNS("http://www.w3.org/2000/svg","svg"); s.setAttribute("width","15");s.setAttribute("height","15");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("fill","none");s.setAttribute("stroke","currentColor");s.setAttribute("stroke-width","2.5"); s.innerHTML='<path d="M12 5v14M5 12h14"/>'; return s; }
-
-const EDIT_ICO = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
-const DEL_ICO = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>';
-
-function tableWrap(headCells, rows){
-  const wrap = el("div",{class:"table-wrap"});
-  const t = el("table");
-  const thead = el("thead"); const trh = el("tr");
-  headCells.forEach(h=>trh.appendChild(el("th",{text:h})));
-  thead.appendChild(trh); t.appendChild(thead);
-  const tb = el("tbody");
-  rows.forEach(r=>tb.appendChild(r));
-  t.appendChild(tb); wrap.appendChild(t);
-  return wrap;
-}
-function confirmDelete(msg, fn){
-  if(window.confirm(msg)) fn();
-}
-
-/* ============ EMPLEADOS ============ */
-function renderEmpleados(main){
-  main.appendChild(pageHead("Empleados", "Expediente del personal de tu empresa",
-    el("button",{class:"btn", onclick:()=>openEmpForm()},[plusIco(),"Nuevo empleado"])));
-
-  const bar = el("div",{class:"toolbar"});
-  const search = el("div",{class:"search"});
-  search.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>';
-  const inp = el("input",{type:"search", placeholder:"Buscar por nombre, puesto o DPI…", value:filters.empQ,
-    oninput:e=>{ filters.empQ=e.target.value; refreshEmpTable(); }});
-  search.appendChild(inp);
-  bar.appendChild(search);
-  const fil = el("div",{class:"filters"});
-  fil.appendChild(selectFilter(["","Todos los departamentos", ...DEPARTAMENTOS], filters.empDep, v=>{ filters.empDep=v; refreshEmpTable(); }, "Todos los departamentos"));
-  fil.appendChild(selectFilter(["","Todos los estados", ...ESTADOS_EMP], filters.empEstado, v=>{ filters.empEstado=v; refreshEmpTable(); }, "Todos los estados"));
-  bar.appendChild(fil);
-  main.appendChild(bar);
-
-  main.appendChild(el("div",{id:"empTableHost"}));
-  refreshEmpTable();
-}
-function selectFilter(opts, val, onchange, allLabel){
-  const s = el("select",{onchange:e=>onchange(e.target.value)});
-  opts.forEach((o,i)=>{
-    if(i===0) s.appendChild(el("option",{value:"", text: allLabel || "Todos"}));
-    else if(i===1) return;
-    else s.appendChild(el("option",{value:o, text:o, selected: o===val ? "selected": null}));
-  });
-  s.value = val || "";
-  return s;
-}
-function empFiltered(){
-  const q = filters.empQ.trim().toLowerCase();
-  return state.empleados.filter(e=>{
-    if(filters.empDep && e.departamento!==filters.empDep) return false;
-    if(filters.empEstado && e.estado!==filters.empEstado) return false;
-    if(q){
-      const hay = (e.nombre+" "+e.puesto+" "+(e.dpi||"")+" "+(e.correo||"")).toLowerCase();
-      if(!hay.includes(q)) return false;
+    function closeDrawer() {
+      $("#drawer").classList.remove("open");
+      $("#scrim").classList.remove("open");
+      document.body.style.overflow = "";
     }
-    return true;
-  }).sort((a,b)=>a.nombre.localeCompare(b.nombre,"es"));
-}
-function refreshEmpTable(){
-  const host = $("#empTableHost"); if(!host) return;
-  host.innerHTML = "";
-  const list = empFiltered();
-  if(!state.empleados.length){
-    host.appendChild(emptyState(ICO_PEOPLE, "Todavía no hay empleados",
-      "Registra a tu primer colaborador para llevar su expediente, asistencia e historial.",
-      el("button",{class:"btn", onclick:()=>openEmpForm()},[plusIco(),"Nuevo empleado"])));
-    return;
-  }
-  if(!list.length){ host.appendChild(el("div",{class:"empty", html:"<b>Sin resultados</b><div>Ajusta la búsqueda o los filtros.</div>"})); return; }
-  const rows = list.map(e=>{
-    const tr = el("tr",{class:"clickable", onclick:()=>openFicha(e.id)});
-    tr.appendChild(el("td",null,[ el("div",{class:"cell-name"},[
-      avatar(e.nombre),
-      el("div",null,[ el("b",{text:e.nombre}), el("small",{text:e.dpi||"Sin DPI"}) ])
-    ]) ]));
-    tr.appendChild(el("td",null,[ el("div",null,[ document.createTextNode(e.puesto||"—"),
-      el("div",{class:"sub", text:e.tipoContrato||""}) ]) ]));
-    tr.appendChild(el("td",{text:e.departamento||"—"}));
-    tr.appendChild(el("td",{class:"num", text:fmtDate(e.fechaIngreso)}));
-    tr.appendChild(el("td",{class:"num", text:money(e.salario)}));
-    tr.appendChild(el("td",null,[ estadoPill(e.estado) ]));
-    const act = el("td",null,[ el("div",{class:"row-actions"},[
-      el("button",{class:"icon-btn", title:"Editar", "aria-label":"Editar", html:EDIT_ICO,
-        onclick:ev=>{ ev.stopPropagation(); openEmpForm(e.id); }}),
-      el("button",{class:"icon-btn", title:"Eliminar", "aria-label":"Eliminar", html:DEL_ICO,
-        onclick:ev=>{ ev.stopPropagation(); confirmDelete(`¿Eliminar a ${e.nombre}? También se quitan sus registros de asistencia, ausencias e historial.`, ()=>deleteEmpleado(e.id)); }})
-    ]) ]);
-    tr.appendChild(act);
-    return tr;
-  });
-  host.appendChild(tableWrap(["Empleado","Puesto","Departamento","Ingreso","Salario base","Estado",""], rows));
-}
-
-/* ============ AUSENCIAS ============ */
-function renderAusencias(main){
-  main.appendChild(pageHead("Ausencias y permisos", "Vacaciones, incapacidades IGSS, permisos y suspensiones",
-    el("button",{class:"btn", onclick:()=>openAusForm()},[plusIco(),"Registrar ausencia"])));
-  const bar = el("div",{class:"toolbar"});
-  bar.appendChild(selectFilter(["","x", ...AUS_ESTADOS], filters.ausEstado, v=>{ filters.ausEstado=v; render(); }, "Todos los estados"));
-  main.appendChild(bar);
-
-  let list = state.ausencias.slice().sort((a,b)=>(b.inicio||"").localeCompare(a.inicio||""));
-  if(filters.ausEstado) list = list.filter(a=>a.estado===filters.ausEstado);
-
-  if(!state.ausencias.length){
-    main.appendChild(emptyState(ICO_PEOPLE, "Sin ausencias registradas",
-      "Anota vacaciones, permisos e incapacidades para llevar el control de días.",
-      el("button",{class:"btn", onclick:()=>openAusForm()},[plusIco(),"Registrar ausencia"])));
-    return;
-  }
-  const rows = list.map(a=>{
-    const tr = el("tr");
-    tr.appendChild(el("td",null,[ el("div",{class:"cell-name"},[ avatar(empName(a.empleadoId)), el("div",null,[ el("b",{text:empName(a.empleadoId)}) ]) ]) ]));
-    tr.appendChild(el("td",{text:a.tipo}));
-    tr.appendChild(el("td",{class:"num", text:fmtDate(a.inicio)+" → "+fmtDate(a.fin)}));
-    tr.appendChild(el("td",{class:"num", text:(a.dias||"—")+""}));
-    tr.appendChild(el("td",null,[ ausPill(a.estado) ]));
-    tr.appendChild(el("td",null,[ el("div",{class:"row-actions"},[
-      a.estado==="Solicitada" ? el("button",{class:"btn sm", text:"Aprobar", onclick:()=>setAusEstado(a.id,"Aprobada")}) : null,
-      a.estado==="Solicitada" ? el("button",{class:"btn sm ghost", text:"Rechazar", onclick:()=>setAusEstado(a.id,"Rechazada")}) : null,
-      el("button",{class:"icon-btn", title:"Editar", html:EDIT_ICO, onclick:()=>openAusForm(a.id)}),
-      el("button",{class:"icon-btn", title:"Eliminar", html:DEL_ICO, onclick:()=>confirmDelete("¿Eliminar esta ausencia?",()=>deleteRow("ausencias",a.id))})
-    ]) ]));
-    return tr;
-  });
-  main.appendChild(tableWrap(["Empleado","Tipo","Período","Días","Estado",""], rows));
-}
-
-/* ============ REGISTROS ============ */
-function renderRegistros(main){
-  main.appendChild(pageHead("Registros e historial", "Contrataciones, aumentos, amonestaciones, capacitaciones y notas",
-    el("button",{class:"btn", onclick:()=>openRegForm()},[plusIco(),"Nuevo registro"])));
-  const bar = el("div",{class:"toolbar"});
-  const empSel = el("select",{onchange:e=>{ filters.regEmp=e.target.value; render(); }});
-  empSel.appendChild(el("option",{value:"", text:"Todos los empleados"}));
-  state.empleados.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre,"es")).forEach(e=>empSel.appendChild(el("option",{value:e.id, text:e.nombre, selected:e.id===filters.regEmp?"selected":null})));
-  bar.appendChild(empSel);
-  bar.appendChild(selectFilter(["","x", ...REG_TIPOS], filters.regTipo, v=>{ filters.regTipo=v; render(); }, "Todos los tipos"));
-  main.appendChild(bar);
-
-  let list = state.registros.slice().sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""));
-  if(filters.regEmp) list = list.filter(r=>r.empleadoId===filters.regEmp);
-  if(filters.regTipo) list = list.filter(r=>r.tipo===filters.regTipo);
-
-  if(!state.registros.length){
-    main.appendChild(emptyState(ICO_PEOPLE, "Sin registros en el historial",
-      "Documenta hechos importantes del personal: aumentos, promociones, amonestaciones o capacitaciones.",
-      el("button",{class:"btn", onclick:()=>openRegForm()},[plusIco(),"Nuevo registro"])));
-    return;
-  }
-  const rows = list.map(r=>{
-    const tr = el("tr");
-    tr.appendChild(el("td",{class:"num", text:fmtDate(r.fecha)}));
-    tr.appendChild(el("td",null,[ el("div",{class:"cell-name"},[ avatar(empName(r.empleadoId)), el("div",null,[ el("b",{text:empName(r.empleadoId)}) ]) ]) ]));
-    tr.appendChild(el("td",null,[ el("span",{class:"pill plain", text:r.tipo}) ]));
-    tr.appendChild(el("td",null,[ el("div",{class:"sub", text:r.descripcion, style:"color:var(--ink);max-width:420px"}) ]));
-    tr.appendChild(el("td",null,[ el("div",{class:"row-actions"},[
-      el("button",{class:"icon-btn", title:"Editar", html:EDIT_ICO, onclick:()=>openRegForm(r.id)}),
-      el("button",{class:"icon-btn", title:"Eliminar", html:DEL_ICO, onclick:()=>confirmDelete("¿Eliminar este registro del historial?",()=>deleteRow("registros",r.id))})
-    ]) ]));
-    return tr;
-  });
-  main.appendChild(tableWrap(["Fecha","Empleado","Tipo","Descripción",""], rows));
-}
-
-/* ============ ASISTENCIA ============ */
-function renderAsistencia(main){
-  main.appendChild(pageHead("Asistencia diaria", "Marca la asistencia del personal activo por día"));
-  const bar = el("div",{class:"att-toolbar"});
-  const dateInp = el("input",{type:"date", value:filters.attDate, max:todayISO(), onchange:e=>{ filters.attDate=e.target.value||todayISO(); render(); }});
-  bar.appendChild(el("label",{class:"eyebrow", text:"Fecha"}));
-  bar.appendChild(dateInp);
-  bar.appendChild(el("button",{class:"btn ghost sm", text:"Hoy", onclick:()=>{ filters.attDate=todayISO(); render(); }}));
-  bar.appendChild(el("button",{class:"btn sm", text:"Marcar a todos presentes", onclick:()=>markAllPresent()}));
-  main.appendChild(bar);
-
-  const act = activos();
-  if(!act.length){
-    main.appendChild(emptyState(ICO_PEOPLE,"No hay empleados activos","Registra empleados con estado Activo para marcar su asistencia."));
-    return;
-  }
-  const dayRecs = {};
-  state.asistencia.filter(a=>a.fecha===filters.attDate).forEach(a=>{ dayRecs[a.empleadoId]=a; });
-  const rows = act.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre,"es")).map(e=>{
-    const rec = dayRecs[e.id];
-    const tr = el("tr");
-    tr.appendChild(el("td",null,[ el("div",{class:"cell-name"},[ avatar(e.nombre), el("div",null,[ el("b",{text:e.nombre}), el("small",{text:e.puesto||""}) ]) ]) ]));
-    const cell = el("td");
-    const chips = el("div",{class:"att-status-cell"});
-    ASIST_ESTADOS.forEach(st=>{
-      const on = rec && rec.estado===st;
-      chips.appendChild(el("button",{class:"chip"+(on?" on-"+st:""), text:st[0].toUpperCase()+st.slice(1),
-        onclick:()=>setAsistencia(e.id, on?null:st)}));
-    });
-    cell.appendChild(chips);
-    tr.appendChild(cell);
-    // horario
-    const hcell = el("td",{class:"num"});
-    if(rec && rec.estado==="presente"){
-      const t1 = el("input",{type:"time", value:rec.entrada||"", style:"padding:5px 7px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface-2);width:100px",
-        onchange:ev=>updateAsistencia(rec.id,{entrada:ev.target.value})});
-      const t2 = el("input",{type:"time", value:rec.salida||"", style:"padding:5px 7px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface-2);width:100px;margin-left:6px",
-        onchange:ev=>updateAsistencia(rec.id,{salida:ev.target.value})});
-      hcell.appendChild(t1); hcell.appendChild(t2);
-    } else { hcell.appendChild(el("span",{class:"sub", text:"—"})); }
-    tr.appendChild(hcell);
-    return tr;
-  });
-  main.appendChild(tableWrap(["Empleado","Estado del día","Entrada / Salida"], rows));
-
-  const dd = new Date(filters.attDate+"T00:00:00");
-  const resumen = {};
-  ASIST_ESTADOS.forEach(s=>resumen[s]=0);
-  Object.values(dayRecs).forEach(r=>{ if(resumen[r.estado]!=null) resumen[r.estado]++; });
-  const sinMarcar = act.length - Object.keys(dayRecs).length;
-  main.appendChild(el("p",{class:"sub", style:"margin-top:14px;color:var(--muted)",
-    text:`${MESES[dd.getMonth()]} ${dd.getDate()}: ${resumen.presente} presentes · ${resumen.ausente} ausentes · ${resumen.vacaciones} vacaciones · ${resumen.permiso+resumen.incapacidad} permisos/incapacidad · ${sinMarcar} sin marcar`}));
-}
-
-/* ============ mutaciones ============ */
-function upsert(col, obj){
-  clearSamplesIfNeeded();
-  const arr = state[col];
-  const i = arr.findIndex(x=>x.id===obj.id);
-  if(i>=0) arr[i] = obj; else arr.push(obj);
-  persist(col, obj);
-  saveLocal();
-  render();
-}
-function deleteRow(col, id){
-  state[col] = state[col].filter(x=>x.id!==id);
-  persistDelete(col, id);
-  saveLocal();
-  render();
-  toast("Eliminado.");
-}
-function deleteEmpleado(id){
-  state.empleados = state.empleados.filter(e=>e.id!==id);
-  ["asistencia","ausencias","registros"].forEach(col=>{
-    state[col].filter(x=>x.empleadoId===id).forEach(x=>persistDelete(col,x.id));
-    state[col] = state[col].filter(x=>x.empleadoId!==id);
-  });
-  persistDelete("empleados", id);
-  saveLocal(); render(); closeDrawer();
-  toast("Empleado eliminado.");
-}
-function setAusEstado(id, estado){
-  const a = state.ausencias.find(x=>x.id===id); if(!a) return;
-  a.estado = estado; persist("ausencias", a); saveLocal(); render();
-  toast(estado==="Aprobada"?"Ausencia aprobada.":"Ausencia rechazada.");
-}
-function setAsistencia(empId, estado){
-  clearSamplesIfNeeded();
-  const rec = state.asistencia.find(a=>a.empleadoId===empId && a.fecha===filters.attDate);
-  if(estado==null){
-    if(rec){ deleteRow("asistencia", rec.id); }
-    return;
-  }
-  if(rec){ rec.estado = estado; if(estado!=="presente"){ rec.entrada=""; rec.salida=""; } persist("asistencia",rec); }
-  else{
-    const nrec = { id:uid(), empleadoId:empId, fecha:filters.attDate, estado, entrada:"", salida:"", nota:"" };
-    state.asistencia.push(nrec); persist("asistencia", nrec);
-  }
-  saveLocal(); render();
-}
-function updateAsistencia(id, patch){
-  const rec = state.asistencia.find(a=>a.id===id); if(!rec) return;
-  Object.assign(rec, patch); persist("asistencia", rec); saveLocal();
-}
-function markAllPresent(){
-  clearSamplesIfNeeded();
-  activos().forEach(e=>{
-    let rec = state.asistencia.find(a=>a.empleadoId===e.id && a.fecha===filters.attDate);
-    if(!rec){ rec = { id:uid(), empleadoId:e.id, fecha:filters.attDate, estado:"presente", entrada:"", salida:"", nota:"" }; state.asistencia.push(rec); }
-    else rec.estado = "presente";
-    persist("asistencia", rec);
-  });
-  saveLocal(); render(); toast("Todos marcados como presentes.");
-}
-
-/* ============ drawer ============ */
-function openDrawer(title, eyebrow, bodyNode, footNode){
-  const d = $("#drawer");
-  d.innerHTML = "";
-  d.appendChild(el("div",{class:"drawer-head"},[
-    el("div",null,[ el("div",{class:"eyebrow", text:eyebrow||""}), el("h2",{id:"drawerTitle", text:title}) ]),
-    el("button",{class:"x", "aria-label":"Cerrar", html:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>', onclick:closeDrawer})
-  ]));
-  d.appendChild(el("div",{class:"drawer-body"},[bodyNode]));
-  if(footNode) d.appendChild(el("div",{class:"drawer-foot"},[footNode]));
-  d.classList.add("open");
-  $("#scrim").classList.add("open");
-  document.body.style.overflow = "hidden";
-}
-function closeDrawer(){
-  $("#drawer").classList.remove("open");
-  $("#scrim").classList.remove("open");
-  document.body.style.overflow = "";
-}
-function fieldText(label, name, value, opts){
-  opts = opts||{};
-  const inp = el("input",{type:opts.type||"text", name, value:value==null?"":value, placeholder:opts.ph||"", required:opts.required?"required":null, step:opts.step||null, min:opts.min||null, max:opts.max||null});
-  return el("div",{class:"field"},[ el("label",{text:label}), inp, opts.hint?el("div",{class:"hint",text:opts.hint}):null ]);
-}
-function fieldSelect(label, name, value, options, opts){
-  opts = opts||{};
-  const s = el("select",{name, required:opts.required?"required":null});
-  if(opts.placeholder) s.appendChild(el("option",{value:"", text:opts.placeholder}));
-  options.forEach(o=>s.appendChild(el("option",{value:o, text:o, selected:o===value?"selected":null})));
-  s.value = value!=null?value:"";
-  return el("div",{class:"field"},[ el("label",{text:label}), s ]);
-}
-function fieldArea(label, name, value, ph){
-  return el("div",{class:"field"},[ el("label",{text:label}), el("textarea",{name, placeholder:ph||"", text:value||""}) ]);
-}
-function row2(a,b){ return el("div",{class:"field-row"},[a,b]); }
-function formValues(form){
-  const o = {};
-  new FormData(form).forEach((v,k)=>{ o[k]=typeof v==="string"?v.trim():v; });
-  return o;
-}
-
-/* ---- formulario empleado ---- */
-function openEmpForm(id){
-  const e = id ? empById(id) : null;
-  const form = el("form",{id:"empForm", onsubmit:ev=>{ ev.preventDefault(); saveEmpForm(form, id); }});
-  form.appendChild(el("fieldset",null,[ el("legend",{text:"Datos personales"}),
-    fieldText("Nombre completo","nombre", e&&e.nombre, {required:true, ph:"Nombres y apellidos"}),
-    row2(
-      fieldText("DPI","dpi", e&&e.dpi, {ph:"0000 00000 0000"}),
-      fieldText("Fecha de nacimiento","fechaNacimiento", e&&e.fechaNacimiento, {type:"date"})
-    ),
-    row2(
-      fieldText("Teléfono","telefono", e&&e.telefono, {ph:"0000 0000"}),
-      fieldText("Correo","correo", e&&e.correo, {type:"email", ph:"nombre@correo.com"})
-    ),
-    fieldText("Dirección","direccion", e&&e.direccion)
-  ]));
-  form.appendChild(el("fieldset",null,[ el("legend",{text:"Puesto y contrato"}),
-    row2(
-      fieldText("Puesto","puesto", e&&e.puesto, {required:true, ph:"Ej. Vendedor de ruta"}),
-      fieldSelect("Departamento","departamento", e&&e.departamento, DEPARTAMENTOS, {placeholder:"Seleccionar…", required:true})
-    ),
-    row2(
-      fieldSelect("Tipo de contrato","tipoContrato", (e&&e.tipoContrato)||"Indefinido", CONTRATOS),
-      fieldSelect("Estado","estado", (e&&e.estado)||"Activo", ESTADOS_EMP)
-    ),
-    row2(
-      fieldText("Fecha de ingreso","fechaIngreso", (e&&e.fechaIngreso)||todayISO(), {type:"date", required:true}),
-      fieldText("Salario base mensual (Q)","salario", e&&e.salario, {type:"number", step:"0.01", min:"0", ph:"0.00"})
-    )
-  ]));
-  form.appendChild(el("fieldset",null,[ el("legend",{text:"Contacto de emergencia"}),
-    row2(
-      fieldText("Nombre","emergenciaNombre", e&&e.emergenciaNombre),
-      fieldText("Teléfono","emergenciaTel", e&&e.emergenciaTel)
-    )
-  ]));
-  form.appendChild(fieldArea("Notas","notas", e&&e.notas, "Información adicional del expediente"));
-
-  const foot = el("div",null,[
-    el("button",{type:"button", class:"btn ghost", text:"Cancelar", onclick:closeDrawer}),
-    el("button",{type:"submit", class:"btn", text: id?"Guardar cambios":"Registrar empleado", onclick:()=>{} })
-  ]);
-  foot.querySelector("button[type=submit]").addEventListener("click", ev=>{ ev.preventDefault(); saveEmpForm(form, id); });
-  openDrawer(id?"Editar empleado":"Nuevo empleado", id?"Expediente":"Alta de personal", form, foot);
-}
-function saveEmpForm(form, id){
-  if(!form.reportValidity()) return;
-  const v = formValues(form);
-  if(!v.nombre){ toast("El nombre es obligatorio."); return; }
-  const base = id ? {...empById(id)} : { id:uid() };
-  const obj = { ...base, ...v, salario: v.salario? Number(v.salario) : 0 };
-  upsert("empleados", obj);
-  closeDrawer();
-  toast(id?"Empleado actualizado.":"Empleado registrado.");
-}
-
-/* ---- formulario ausencia ---- */
-function openAusForm(id){
-  const a = id ? state.ausencias.find(x=>x.id===id) : null;
-  if(!state.empleados.length){ toast("Primero registra al menos un empleado."); return; }
-  const form = el("form",{id:"ausForm"});
-  const empOpts = state.empleados.slice().sort((x,y)=>x.nombre.localeCompare(y.nombre,"es"));
-  const sEmp = el("select",{name:"empleadoId", required:"required"});
-  sEmp.appendChild(el("option",{value:"", text:"Seleccionar empleado…"}));
-  empOpts.forEach(e=>sEmp.appendChild(el("option",{value:e.id, text:e.nombre, selected:a&&a.empleadoId===e.id?"selected":null})));
-  form.appendChild(el("div",{class:"field"},[ el("label",{text:"Empleado"}), sEmp ]));
-  form.appendChild(fieldSelect("Tipo","tipo", a&&a.tipo, AUS_TIPOS, {placeholder:"Seleccionar…", required:true}));
-  form.appendChild(row2(
-    fieldText("Desde","inicio", (a&&a.inicio)||todayISO(), {type:"date", required:true}),
-    fieldText("Hasta","fin", (a&&a.fin)||todayISO(), {type:"date", required:true})
-  ));
-  form.appendChild(row2(
-    fieldText("Días","dias", a&&a.dias, {type:"number", min:"0", step:"0.5", hint:"Días hábiles solicitados"}),
-    fieldSelect("Estado","estado", (a&&a.estado)||"Solicitada", AUS_ESTADOS)
-  ));
-  form.appendChild(fieldArea("Motivo / observaciones","motivo", a&&a.motivo));
-  // autocalcular días
-  const di = form.querySelector('[name=inicio]'), df = form.querySelector('[name=fin]'), dd = form.querySelector('[name=dias]');
-  function calc(){
-    if(di.value && df.value && !dd.value){
-      const d1=new Date(di.value), d2=new Date(df.value);
-      const n = Math.round((d2-d1)/86400000)+1;
-      if(n>0) dd.value = n;
+    function fieldText(label, name, value, opts) {
+      opts = opts || {};
+      const inp = el("input", { type: opts.type || "text", name, value: value == null ? "" : value, placeholder: opts.ph || "", required: opts.required ? "required" : null, step: opts.step || null, min: opts.min || null, max: opts.max || null });
+      return el("div", { class: "field" }, [el("label", { text: label }), inp, opts.hint ? el("div", { class: "hint", text: opts.hint }) : null]);
     }
-  }
-  di.addEventListener("change",calc); df.addEventListener("change",calc);
+    function fieldSelect(label, name, value, options, opts) {
+      opts = opts || {};
+      const s = el("select", { name, required: opts.required ? "required" : null });
+      if (opts.placeholder) s.appendChild(el("option", { value: "", text: opts.placeholder }));
+      options.forEach(o => s.appendChild(el("option", { value: o, text: o, selected: o === value ? "selected" : null })));
+      s.value = value != null ? value : "";
+      return el("div", { class: "field" }, [el("label", { text: label }), s]);
+    }
+    function fieldArea(label, name, value, ph) {
+      return el("div", { class: "field" }, [el("label", { text: label }), el("textarea", { name, placeholder: ph || "", text: value || "" })]);
+    }
+    function row2(a, b) { return el("div", { class: "field-row" }, [a, b]); }
+    function formValues(form) {
+      const o = {};
+      new FormData(form).forEach((v, k) => { o[k] = typeof v === "string" ? v.trim() : v; });
+      return o;
+    }
 
-  const foot = el("div",null,[
-    el("button",{type:"button", class:"btn ghost", text:"Cancelar", onclick:closeDrawer}),
-    el("button",{type:"button", class:"btn", text:id?"Guardar":"Registrar", onclick:()=>{
-      if(!form.reportValidity()) return;
+    /* ---- formulario empleado ---- */
+    function openEmpForm(id) {
+      const e = id ? empById(id) : null;
+      const form = el("form", { id: "empForm", onsubmit: ev => { ev.preventDefault(); saveEmpForm(form, id); } });
+      form.appendChild(el("fieldset", null, [el("legend", { text: "Datos personales" }),
+      fieldText("Nombre completo", "nombre", e && e.nombre, { required: true, ph: "Nombres y apellidos" }),
+      row2(
+        fieldText("DPI", "dpi", e && e.dpi, { ph: "0000 00000 0000" }),
+        fieldText("Fecha de nacimiento", "fechaNacimiento", e && e.fechaNacimiento, { type: "date" })
+      ),
+      row2(
+        fieldText("Teléfono", "telefono", e && e.telefono, { ph: "0000 0000" }),
+        fieldText("Correo", "correo", e && e.correo, { type: "email", ph: "nombre@correo.com" })
+      ),
+      fieldText("Dirección", "direccion", e && e.direccion)
+      ]));
+      form.appendChild(el("fieldset", null, [el("legend", { text: "Puesto y contrato" }),
+      row2(
+        fieldText("Puesto", "puesto", e && e.puesto, { required: true, ph: "Ej. Vendedor de ruta" }),
+        fieldSelect("Departamento", "departamento", e && e.departamento, DEPARTAMENTOS, { placeholder: "Seleccionar…", required: true })
+      ),
+      row2(
+        fieldSelect("Tipo de contrato", "tipoContrato", (e && e.tipoContrato) || "Indefinido", CONTRATOS),
+        fieldSelect("Estado", "estado", (e && e.estado) || "Activo", ESTADOS_EMP)
+      ),
+      row2(
+        fieldText("Fecha de ingreso", "fechaIngreso", (e && e.fechaIngreso) || todayISO(), { type: "date", required: true }),
+        fieldText("Salario base mensual (Q)", "salario", e && e.salario, { type: "number", step: "0.01", min: "0", ph: "0.00" })
+      )
+      ]));
+      form.appendChild(el("fieldset", null, [el("legend", { text: "Contacto de emergencia" }),
+      row2(
+        fieldText("Nombre", "emergenciaNombre", e && e.emergenciaNombre),
+        fieldText("Teléfono", "emergenciaTel", e && e.emergenciaTel)
+      )
+      ]));
+      form.appendChild(fieldArea("Notas", "notas", e && e.notas, "Información adicional del expediente"));
+
+      const foot = el("div", null, [
+        el("button", { type: "button", class: "btn ghost", text: "Cancelar", onclick: closeDrawer }),
+        el("button", { type: "submit", class: "btn", text: id ? "Guardar cambios" : "Registrar empleado", onclick: () => { } })
+      ]);
+      foot.querySelector("button[type=submit]").addEventListener("click", ev => { ev.preventDefault(); saveEmpForm(form, id); });
+      openDrawer(id ? "Editar empleado" : "Nuevo empleado", id ? "Expediente" : "Alta de personal", form, foot);
+    }
+    function saveEmpForm(form, id) {
+      if (!form.reportValidity()) return;
       const v = formValues(form);
-      const base = id ? {...state.ausencias.find(x=>x.id===id)} : { id:uid() };
-      upsert("ausencias", { ...base, ...v, dias: v.dias?Number(v.dias):null });
-      closeDrawer(); toast(id?"Ausencia actualizada.":"Ausencia registrada.");
-    }})
-  ]);
-  openDrawer(id?"Editar ausencia":"Registrar ausencia", "Vacaciones y permisos", form, foot);
-}
+      if (!v.nombre) { toast("El nombre es obligatorio."); return; }
+      const base = id ? { ...empById(id) } : { id: uid() };
+      const obj = { ...base, ...v, salario: v.salario ? Number(v.salario) : 0 };
+      upsert("empleados", obj);
+      closeDrawer();
+      toast(id ? "Empleado actualizado." : "Empleado registrado.");
+    }
 
-/* ---- formulario registro ---- */
-function openRegForm(id, presetEmp){
-  const r = id ? state.registros.find(x=>x.id===id) : null;
-  if(!state.empleados.length){ toast("Primero registra al menos un empleado."); return; }
-  const form = el("form",{id:"regForm"});
-  const empOpts = state.empleados.slice().sort((x,y)=>x.nombre.localeCompare(y.nombre,"es"));
-  const sEmp = el("select",{name:"empleadoId", required:"required"});
-  sEmp.appendChild(el("option",{value:"", text:"Seleccionar empleado…"}));
-  empOpts.forEach(e=>sEmp.appendChild(el("option",{value:e.id, text:e.nombre, selected:(r&&r.empleadoId===e.id)||e.id===presetEmp?"selected":null})));
-  form.appendChild(el("div",{class:"field"},[ el("label",{text:"Empleado"}), sEmp ]));
-  form.appendChild(row2(
-    fieldSelect("Tipo de registro","tipo", r&&r.tipo, REG_TIPOS, {placeholder:"Seleccionar…", required:true}),
-    fieldText("Fecha","fecha", (r&&r.fecha)||todayISO(), {type:"date", required:true})
-  ));
-  form.appendChild(fieldArea("Descripción","descripcion", r&&r.descripcion, "Detalle del hecho: montos, motivos, acuerdos…"));
-  const foot = el("div",null,[
-    el("button",{type:"button", class:"btn ghost", text:"Cancelar", onclick:closeDrawer}),
-    el("button",{type:"button", class:"btn", text:id?"Guardar":"Agregar al historial", onclick:()=>{
-      if(!form.reportValidity()) return;
-      const v = formValues(form);
-      const base = id ? {...state.registros.find(x=>x.id===id)} : { id:uid() };
-      upsert("registros", { ...base, ...v });
-      closeDrawer(); toast(id?"Registro actualizado.":"Registro agregado.");
-    }})
-  ]);
-  openDrawer(id?"Editar registro":"Nuevo registro", "Historial del empleado", form, foot);
-}
+    /* ---- formulario ausencia ---- */
+    function openAusForm(id) {
+      const a = id ? state.ausencias.find(x => x.id === id) : null;
+      if (!state.empleados.length) { toast("Primero registra al menos un empleado."); return; }
+      const form = el("form", { id: "ausForm" });
+      const empOpts = state.empleados.slice().sort((x, y) => x.nombre.localeCompare(y.nombre, "es"));
+      const sEmp = el("select", { name: "empleadoId", required: "required" });
+      sEmp.appendChild(el("option", { value: "", text: "Seleccionar empleado…" }));
+      empOpts.forEach(e => sEmp.appendChild(el("option", { value: e.id, text: e.nombre, selected: a && a.empleadoId === e.id ? "selected" : null })));
+      form.appendChild(el("div", { class: "field" }, [el("label", { text: "Empleado" }), sEmp]));
+      form.appendChild(fieldSelect("Tipo", "tipo", a && a.tipo, AUS_TIPOS, { placeholder: "Seleccionar…", required: true }));
+      form.appendChild(row2(
+        fieldText("Desde", "inicio", (a && a.inicio) || todayISO(), { type: "date", required: true }),
+        fieldText("Hasta", "fin", (a && a.fin) || todayISO(), { type: "date", required: true })
+      ));
+      form.appendChild(row2(
+        fieldText("Días", "dias", a && a.dias, { type: "number", min: "0", step: "0.5", hint: "Días hábiles solicitados" }),
+        fieldSelect("Estado", "estado", (a && a.estado) || "Solicitada", AUS_ESTADOS)
+      ));
+      form.appendChild(fieldArea("Motivo / observaciones", "motivo", a && a.motivo));
+      // autocalcular días
+      const di = form.querySelector('[name=inicio]'), df = form.querySelector('[name=fin]'), dd = form.querySelector('[name=dias]');
+      function calc() {
+        if (di.value && df.value && !dd.value) {
+          const d1 = new Date(di.value), d2 = new Date(df.value);
+          const n = Math.round((d2 - d1) / 86400000) + 1;
+          if (n > 0) dd.value = n;
+        }
+      }
+      di.addEventListener("change", calc); df.addEventListener("change", calc);
 
-/* ---- ficha del empleado ---- */
-function openFicha(id){
-  const e = empById(id); if(!e) return;
-  const body = el("div");
-  body.appendChild(el("div",{class:"ficha-top"},[
-    avatar(e.nombre),
-    el("div",null,[ el("b",{text:e.nombre}), el("small",{text:(e.puesto||"—")+" · "+(e.departamento||"—")}) ])
-  ]));
-  body.appendChild(el("div",{style:"margin-bottom:16px"},[ estadoPill(e.estado),
-    el("span",{class:"pill plain", text:e.tipoContrato||"—", style:"margin-left:6px"}) ]));
+      const foot = el("div", null, [
+        el("button", { type: "button", class: "btn ghost", text: "Cancelar", onclick: closeDrawer }),
+        el("button", {
+          type: "button", class: "btn", text: id ? "Guardar" : "Registrar", onclick: () => {
+            if (!form.reportValidity()) return;
+            const v = formValues(form);
+            const base = id ? { ...state.ausencias.find(x => x.id === id) } : { id: uid() };
+            upsert("ausencias", { ...base, ...v, dias: v.dias ? Number(v.dias) : null });
+            closeDrawer(); toast(id ? "Ausencia actualizada." : "Ausencia registrada.");
+          }
+        })
+      ]);
+      openDrawer(id ? "Editar ausencia" : "Registrar ausencia", "Vacaciones y permisos", form, foot);
+    }
 
-  const dl = el("dl",{class:"dl"});
-  const add=(k,v)=>dl.appendChild(el("div",null,[ el("dt",{text:k}), el("dd",{text:v||"—"}) ]));
-  add("DPI", e.dpi);
-  add("Fecha de ingreso", fmtDate(e.fechaIngreso));
-  add("Antigüedad", yearsBetween(e.fechaIngreso)+" año(s)");
-  add("Salario base", money(e.salario));
-  add("Teléfono", e.telefono);
-  add("Correo", e.correo);
-  add("Nacimiento", fmtDate(e.fechaNacimiento));
-  add("Emergencia", e.emergenciaNombre ? (e.emergenciaNombre+" · "+(e.emergenciaTel||"")) : "");
-  body.appendChild(dl);
-  if(e.direccion) body.appendChild(el("p",{class:"sub", style:"margin:-6px 0 16px", text:"Dirección: "+e.direccion}));
-  if(e.notas) body.appendChild(el("p",{class:"sub", style:"margin:-6px 0 16px;color:var(--ink)", text:e.notas}));
+    /* ---- formulario registro ---- */
+    function openRegForm(id, presetEmp) {
+      const r = id ? state.registros.find(x => x.id === id) : null;
+      if (!state.empleados.length) { toast("Primero registra al menos un empleado."); return; }
+      const form = el("form", { id: "regForm" });
+      const empOpts = state.empleados.slice().sort((x, y) => x.nombre.localeCompare(y.nombre, "es"));
+      const sEmp = el("select", { name: "empleadoId", required: "required" });
+      sEmp.appendChild(el("option", { value: "", text: "Seleccionar empleado…" }));
+      empOpts.forEach(e => sEmp.appendChild(el("option", { value: e.id, text: e.nombre, selected: (r && r.empleadoId === e.id) || e.id === presetEmp ? "selected" : null })));
+      form.appendChild(el("div", { class: "field" }, [el("label", { text: "Empleado" }), sEmp]));
+      form.appendChild(row2(
+        fieldSelect("Tipo de registro", "tipo", r && r.tipo, REG_TIPOS, { placeholder: "Seleccionar…", required: true }),
+        fieldText("Fecha", "fecha", (r && r.fecha) || todayISO(), { type: "date", required: true })
+      ));
+      form.appendChild(fieldArea("Descripción", "descripcion", r && r.descripcion, "Detalle del hecho: montos, motivos, acuerdos…"));
+      const foot = el("div", null, [
+        el("button", { type: "button", class: "btn ghost", text: "Cancelar", onclick: closeDrawer }),
+        el("button", {
+          type: "button", class: "btn", text: id ? "Guardar" : "Agregar al historial", onclick: () => {
+            if (!form.reportValidity()) return;
+            const v = formValues(form);
+            const base = id ? { ...state.registros.find(x => x.id === id) } : { id: uid() };
+            upsert("registros", { ...base, ...v });
+            closeDrawer(); toast(id ? "Registro actualizado." : "Registro agregado.");
+          }
+        })
+      ]);
+      openDrawer(id ? "Editar registro" : "Nuevo registro", "Historial del empleado", form, foot);
+    }
 
-  // prestaciones estimadas
-  const anios = yearsBetween(e.fechaIngreso);
-  const sal = Number(e.salario)||0;
-  const mesesAnio = Math.max(1, Math.min(12, monthsBetween(e.fechaIngreso)));
-  const bono14 = sal * mesesAnio / 12;
-  const aguinaldo = sal * mesesAnio / 12;
-  const vacDias = anios>=1 ? 15 : 0;
-  const tomadas = state.ausencias.filter(a=>a.empleadoId===id && a.tipo==="Vacaciones" && a.estado==="Aprobada").reduce((s,a)=>s+(Number(a.dias)||0),0);
-  const indem = sal * anios;
-  body.appendChild(el("div",{class:"sect-title", text:"Estimación de prestaciones"}));
-  const prest = el("div",{class:"prest"});
-  const pbox=(k,v)=>prest.appendChild(el("div",{class:"pbox"},[ el("div",{class:"k",text:k}), el("div",{class:"v",text:v}) ]));
-  pbox("Bono 14 (proyect.)", money(bono14));
-  pbox("Aguinaldo (proyect.)", money(aguinaldo));
-  pbox("Vacaciones al año", vacDias + " días");
-  pbox("Vacaciones tomadas", tomadas + " días");
-  pbox("Indemnización aprox.", money(indem));
-  pbox("Años completos", anios+"");
-  prest.appendChild(el("div",{class:"prest-note", text:"Cálculos aproximados según prestaciones de ley en Guatemala (Bono 14, aguinaldo, 15 días de vacaciones por año, indemnización = 1 salario por año). Verifica con tu contador antes de pagar."}));
-  body.appendChild(prest);
+    /* ---- ficha del empleado ---- */
+    function openFicha(id) {
+      const e = empById(id); if (!e) return;
+      const body = el("div");
+      body.appendChild(el("div", { class: "ficha-top" }, [
+        avatar(e.nombre),
+        el("div", null, [el("b", { text: e.nombre }), el("small", { text: (e.puesto || "—") + " · " + (e.departamento || "—") })])
+      ]));
+      body.appendChild(el("div", { style: "margin-bottom:16px" }, [estadoPill(e.estado),
+      el("span", { class: "pill plain", text: e.tipoContrato || "—", style: "margin-left:6px" })]));
 
-  // ausencias del empleado
-  body.appendChild(el("div",{class:"sect-title"},[ "Ausencias", el("button",{class:"btn sm ghost", text:"+ Agregar", onclick:()=>openAusForm()}) ]));
-  const aus = state.ausencias.filter(a=>a.empleadoId===id).sort((a,b)=>(b.inicio||"").localeCompare(a.inicio||""));
-  if(!aus.length) body.appendChild(el("div",{class:"empty-mini", text:"Sin ausencias registradas."}));
-  else{
-    const list = el("div",{class:"mini-list"});
-    aus.forEach(a=>list.appendChild(el("div",{class:"mini-item"},[
-      el("div",{class:"mi-head"},[ el("b",{text:a.tipo}), ausPill(a.estado) ]),
-      el("div",{class:"mi-date", text:fmtDate(a.inicio)+" → "+fmtDate(a.fin)+"  ·  "+(a.dias||"?")+" día(s)"}),
-      a.motivo?el("p",{text:a.motivo}):null
-    ])));
-    body.appendChild(list);
-  }
+      const dl = el("dl", { class: "dl" });
+      const add = (k, v) => dl.appendChild(el("div", null, [el("dt", { text: k }), el("dd", { text: v || "—" })]));
+      add("DPI", e.dpi);
+      add("Fecha de ingreso", fmtDate(e.fechaIngreso));
+      add("Antigüedad", yearsBetween(e.fechaIngreso) + " año(s)");
+      add("Salario base", money(e.salario));
+      add("Teléfono", e.telefono);
+      add("Correo", e.correo);
+      add("Nacimiento", fmtDate(e.fechaNacimiento));
+      add("Emergencia", e.emergenciaNombre ? (e.emergenciaNombre + " · " + (e.emergenciaTel || "")) : "");
+      body.appendChild(dl);
+      if (e.direccion) body.appendChild(el("p", { class: "sub", style: "margin:-6px 0 16px", text: "Dirección: " + e.direccion }));
+      if (e.notas) body.appendChild(el("p", { class: "sub", style: "margin:-6px 0 16px;color:var(--ink)", text: e.notas }));
 
-  // historial del empleado
-  body.appendChild(el("div",{class:"sect-title"},[ "Historial", el("button",{class:"btn sm ghost", text:"+ Agregar", onclick:()=>openRegForm(null, id)}) ]));
-  const regs = state.registros.filter(r=>r.empleadoId===id).sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""));
-  if(!regs.length) body.appendChild(el("div",{class:"empty-mini", text:"Sin registros en el historial."}));
-  else{
-    const list = el("div",{class:"mini-list"});
-    regs.forEach(r=>list.appendChild(el("div",{class:"mini-item"},[
-      el("div",{class:"mi-head"},[ el("b",{text:r.tipo}), el("span",{class:"mi-date", text:fmtDate(r.fecha)}) ]),
-      r.descripcion?el("p",{text:r.descripcion}):null
-    ])));
-    body.appendChild(list);
-  }
+      // prestaciones estimadas
+      const anios = yearsBetween(e.fechaIngreso);
+      const sal = Number(e.salario) || 0;
+      const mesesAnio = Math.max(1, Math.min(12, monthsBetween(e.fechaIngreso)));
+      const bono14 = sal * mesesAnio / 12;
+      const aguinaldo = sal * mesesAnio / 12;
+      const vacDias = anios >= 1 ? 15 : 0;
+      const tomadas = state.ausencias.filter(a => a.empleadoId === id && a.tipo === "Vacaciones" && a.estado === "Aprobada").reduce((s, a) => s + (Number(a.dias) || 0), 0);
+      const indem = sal * anios;
+      body.appendChild(el("div", { class: "sect-title", text: "Estimación de prestaciones" }));
+      const prest = el("div", { class: "prest" });
+      const pbox = (k, v) => prest.appendChild(el("div", { class: "pbox" }, [el("div", { class: "k", text: k }), el("div", { class: "v", text: v })]));
+      pbox("Bono 14 (proyect.)", money(bono14));
+      pbox("Aguinaldo (proyect.)", money(aguinaldo));
+      pbox("Vacaciones al año", vacDias + " días");
+      pbox("Vacaciones tomadas", tomadas + " días");
+      pbox("Indemnización aprox.", money(indem));
+      pbox("Años completos", anios + "");
+      prest.appendChild(el("div", { class: "prest-note", text: "Cálculos aproximados según prestaciones de ley en Guatemala (Bono 14, aguinaldo, 15 días de vacaciones por año, indemnización = 1 salario por año). Verifica con tu contador antes de pagar." }));
+      body.appendChild(prest);
 
-  const foot = el("div",null,[
-    el("button",{class:"btn danger", text:"Eliminar", onclick:()=>confirmDelete(`¿Eliminar a ${e.nombre} y todos sus registros?`, ()=>deleteEmpleado(id))}),
-    el("button",{class:"btn ghost", text:"Cerrar", onclick:closeDrawer}),
-    el("button",{class:"btn", text:"Editar", onclick:()=>openEmpForm(id)})
-  ]);
-  openDrawer(e.nombre, "Ficha del empleado", body, foot);
-}
+      // ausencias del empleado
+      body.appendChild(el("div", { class: "sect-title" }, ["Ausencias", el("button", { class: "btn sm ghost", text: "+ Agregar", onclick: () => openAusForm() })]));
+      const aus = state.ausencias.filter(a => a.empleadoId === id).sort((a, b) => (b.inicio || "").localeCompare(a.inicio || ""));
+      if (!aus.length) body.appendChild(el("div", { class: "empty-mini", text: "Sin ausencias registradas." }));
+      else {
+        const list = el("div", { class: "mini-list" });
+        aus.forEach(a => list.appendChild(el("div", { class: "mini-item" }, [
+          el("div", { class: "mi-head" }, [el("b", { text: a.tipo }), ausPill(a.estado)]),
+          el("div", { class: "mi-date", text: fmtDate(a.inicio) + " → " + fmtDate(a.fin) + "  ·  " + (a.dias || "?") + " día(s)" }),
+          a.motivo ? el("p", { text: a.motivo }) : null
+        ])));
+        body.appendChild(list);
+      }
 
-/* ============ tema ============ */
-function applyTheme(t){
-  if(t==="system") document.documentElement.removeAttribute("data-theme");
-  else document.documentElement.setAttribute("data-theme", t);
-  try{ localStorage.setItem("rrhh_theme", t); }catch(e){}
-  const lbl = { light:"Claro", dark:"Oscuro", system:"Automático" };
-  const n = $("#themeLbl"); if(n) n.textContent = lbl[t];
-}
-function initTheme(){
-  let t = "system";
-  try{ t = localStorage.getItem("rrhh_theme") || "system"; }catch(e){}
-  applyTheme(t);
-  $("#themeBtn").addEventListener("click", ()=>{
-    let cur = "system";
-    try{ cur = localStorage.getItem("rrhh_theme") || "system"; }catch(e){}
-    applyTheme({ system:"light", light:"dark", dark:"system" }[cur]);
-  });
-}
+      // historial del empleado
+      body.appendChild(el("div", { class: "sect-title" }, ["Historial", el("button", { class: "btn sm ghost", text: "+ Agregar", onclick: () => openRegForm(null, id) })]));
+      const regs = state.registros.filter(r => r.empleadoId === id).sort((a, b) => (b.fecha || "").localeCompare(a.fecha || ""));
+      if (!regs.length) body.appendChild(el("div", { class: "empty-mini", text: "Sin registros en el historial." }));
+      else {
+        const list = el("div", { class: "mini-list" });
+        regs.forEach(r => list.appendChild(el("div", { class: "mini-item" }, [
+          el("div", { class: "mi-head" }, [el("b", { text: r.tipo }), el("span", { class: "mi-date", text: fmtDate(r.fecha) })]),
+          r.descripcion ? el("p", { text: r.descripcion }) : null
+        ])));
+        body.appendChild(list);
+      }
 
-/* ============ arranque ============ */
-function boot(){
-  initTheme();
-  $("#nav").addEventListener("click", ev=>{
-    const b = ev.target.closest("button[data-view]"); if(!b) return;
-    view = b.dataset.view; render();
-  });
-  $("#scrim").addEventListener("click", closeDrawer);
-  document.addEventListener("keydown", ev=>{ if(ev.key==="Escape") closeDrawer(); });
+      const foot = el("div", null, [
+        el("button", { class: "btn danger", text: "Eliminar", onclick: () => confirmDelete(`¿Eliminar a ${e.nombre} y todos sus registros?`, () => deleteEmpleado(id)) }),
+        el("button", { class: "btn ghost", text: "Cerrar", onclick: closeDrawer }),
+        el("button", { class: "btn", text: "Editar", onclick: () => openEmpForm(id) })
+      ]);
+      openDrawer(e.nombre, "Ficha del empleado", body, foot);
+    }
 
-  $("#exportBtn").addEventListener("click", exportData);
-  $("#importBtn").addEventListener("click", ()=>$("#importFile").click());
-  $("#importFile").addEventListener("change", ev=>{
-    const f = ev.target.files && ev.target.files[0];
-    if(f && confirm("Importar reemplazará todos los datos actuales de este navegador. ¿Continuar?")) importData(f);
-    ev.target.value = "";
-  });
+    /* ============ tema ============ */
+    function applyTheme(t) {
+      if (t === "system") document.documentElement.removeAttribute("data-theme");
+      else document.documentElement.setAttribute("data-theme", t);
+      try { localStorage.setItem("rrhh_theme", t); } catch (e) { }
+      const lbl = { light: "Claro", dark: "Oscuro", system: "Automático" };
+      const n = $("#themeLbl"); if (n) n.textContent = lbl[t];
+    }
+    function initTheme() {
+      let t = "system";
+      try { t = localStorage.getItem("rrhh_theme") || "system"; } catch (e) { }
+      applyTheme(t);
+      $("#themeBtn").addEventListener("click", () => {
+        let cur = "system";
+        try { cur = localStorage.getItem("rrhh_theme") || "system"; } catch (e) { }
+        applyTheme({ system: "light", light: "dark", dark: "system" }[cur]);
+      });
+    }
 
-  const hadLocal = loadLocal();
-  if(!hadLocal) loadSamples();
-  render();
-}
-boot();
-</script>
+    /* ============ arranque ============ */
+    function boot() {
+      initTheme();
+      $("#nav").addEventListener("click", ev => {
+        const b = ev.target.closest("button[data-view]"); if (!b) return;
+        view = b.dataset.view; render();
+      });
+      $("#scrim").addEventListener("click", closeDrawer);
+      document.addEventListener("keydown", ev => { if (ev.key === "Escape") closeDrawer(); });
+
+      $("#exportBtn").addEventListener("click", exportData);
+      $("#importBtn").addEventListener("click", () => $("#importFile").click());
+      $("#importFile").addEventListener("change", ev => {
+        const f = ev.target.files && ev.target.files[0];
+        if (f && confirm("Importar reemplazará todos los datos actuales de este navegador. ¿Continuar?")) importData(f);
+        ev.target.value = "";
+      });
+
+      const hadLocal = loadLocal();
+      if (!hadLocal) loadSamples();
+      render();
+    }
+    boot();
+  </script>
 </body>
+
 </html>
