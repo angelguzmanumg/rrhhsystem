@@ -1,16 +1,31 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Control de Personal</title>
+  <title>Sistema de Recursos Humanos | ProgramasGT</title>
   <meta name="description"
-    content="Panel de recursos humanos para una pequeña empresa: registro de empleados, asistencia, ausencias e historial.">
+    content="Sistema de Recursos Humanos de ProgramasGT: expedientes, planilla, asistencia, ausencias e historial del personal. Demostración en línea, lista para probar.">
+  <meta name="author" content="ProgramasGT">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#04080F">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_GT">
+  <meta property="og:site_name" content="ProgramasGT">
+  <meta property="og:title" content="Sistema de Recursos Humanos | ProgramasGT">
+  <meta property="og:description"
+    content="Expedientes, planilla, asistencia, permisos y prestaciones de ley de Guatemala en un solo panel. Demostración en línea.">
+  <meta property="og:image" content="https://programasgt.art/og-image.jpg">
+  <link rel="icon" href="https://programasgt.art/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+
+  <!-- Inclinacion 3D declarativa. Si el CDN cae, el panel funciona igual:
+       queda el vidrio, el resplandor y el resto de la capa visual. -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
   <style>
     img {
       max-width: 100%
@@ -1297,9 +1312,1084 @@
       }
     }
   </style>
+  <!-- ==========================================================
+       PIEL PROGRAMASGT — capa aditiva sobre el panel de RRHH
+
+       No reescribe el CSS original: lo redefine desde los tokens y
+       le anade el lenguaje visual del sitio (malla de circuito,
+       vidrio de instrumento, lluvia de datos, glow azul).
+
+       Para revertir: borra este bloque, el script pgt-piel-js y la
+       cabecera .pgt-top, y devuelve el enlace de Google Fonts a
+       Bricolage Grotesque + IBM Plex.
+       ========================================================== -->
+  <style id="pgt-piel">
+    /* ---------- 1. Tokens ----------
+       La paleta verde original se cambia por el azul de ingenieria de
+       la marca. Los roles semanticos (ok / warn / crit / info) se
+       mantienen: un estado no puede depender del color de marca. */
+    :root {
+      color-scheme: dark light;
+
+      --ground: #EEF2F7;
+      --surface: #FFFFFF;
+      --surface-2: #F2F6FB;
+      --ink: #071120;
+      --muted: #42536B;
+      --faint: #5E6E82;
+      --line: #CBD6E4;
+      /* Un borde DECORATIVO puede ser tenue; el de un control necesita
+         3:1 (WCAG 1.4.11). Por eso line-strong es mas oscuro que el
+         original: medido, #CFD7D0 daba 1.5:1 sobre blanco. */
+      --line-strong: #6F849F;
+      --accent: #0B63C4;
+      --accent-ink: #0A55A8;
+      --accent-soft: rgba(11, 99, 196, .10);
+      --on-accent: #FFFFFF;
+      --ok: #0E7A55;
+      --ok-soft: #DDF0E7;
+      --warn: #96600B;
+      --warn-soft: #F7EBD6;
+      --crit: #A93A3A;
+      --crit-soft: #F6E1DF;
+      --info: #2F6488;
+      --info-soft: #E2EDF4;
+      --shadow: 0 1px 2px rgba(7, 17, 32, .06), 0 14px 34px -14px rgba(7, 17, 32, .20);
+      --radius: 12px;
+
+      --sans: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --display: "Plus Jakarta Sans", system-ui, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+      --circuito: rgba(11, 99, 196, .10);
+      --vid-solidez: 86%;
+      --vid-blur: 14px;
+      --vid-borde: rgba(11, 99, 196, .20);
+      --vid-luz: rgba(255, 255, 255, .85);
+      --vid-brillo: rgba(11, 99, 196, .20);
+      --vid-alta: 0 2px 4px rgba(7, 17, 32, .07), 0 28px 54px -26px rgba(11, 99, 196, .40);
+      --curva: cubic-bezier(.2, .8, .2, 1);
+      --pgt-h: 76px;
+    }
+
+    /* El tema oscuro llega por dos caminos: el boton (data-theme) y la
+       preferencia del sistema. Los dos tienen que decir lo mismo. */
+    :root[data-theme="dark"] {
+      --ground: #04080F;
+      --surface: #0A121F;
+      --surface-2: #121C2C;
+      --ink: #E7EEF8;
+      --muted: #9FB0C6;
+      /* Sobre vidrio al 62% el gris sutil perdia contraste: se sube. */
+      --faint: #8CA0BA;
+      --line: #1D2A3D;
+      --line-strong: #50688C;
+      --accent: #2A9BF5;
+      --accent-ink: #5CB6FF;
+      --accent-soft: rgba(42, 155, 245, .16);
+      --on-accent: #03070E;
+      --ok: #37C08C;
+      --ok-soft: #0F2E24;
+      --warn: #D69B4E;
+      --warn-soft: #36291A;
+      --crit: #E08079;
+      --crit-soft: #38211F;
+      --info: #7FB0CC;
+      --info-soft: #14293A;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 18px 40px -20px rgba(0, 0, 0, .75);
+      --circuito: rgba(90, 175, 255, .13);
+      --vid-solidez: 62%;
+      --vid-blur: 18px;
+      --vid-borde: rgba(140, 195, 255, .16);
+      --vid-luz: rgba(180, 220, 255, .42);
+      --vid-brillo: rgba(79, 163, 255, .28);
+      --vid-alta:
+        0 2px 6px rgba(0, 0, 0, .6),
+        0 36px 66px -28px rgba(11, 99, 196, .55),
+        0 0 0 1px rgba(79, 163, 255, .20);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --ground: #04080F;
+        --surface: #0A121F;
+        --surface-2: #121C2C;
+        --ink: #E7EEF8;
+        --muted: #9FB0C6;
+        --faint: #8CA0BA;
+        --line: #1D2A3D;
+        --line-strong: #50688C;
+        --accent: #2A9BF5;
+        --accent-ink: #5CB6FF;
+        --accent-soft: rgba(42, 155, 245, .16);
+        --on-accent: #03070E;
+        --ok: #37C08C;
+        --ok-soft: #0F2E24;
+        --warn: #D69B4E;
+        --warn-soft: #36291A;
+        --crit: #E08079;
+        --crit-soft: #38211F;
+        --info: #7FB0CC;
+        --info-soft: #14293A;
+        --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 18px 40px -20px rgba(0, 0, 0, .75);
+        --circuito: rgba(90, 175, 255, .13);
+        --vid-solidez: 62%;
+        --vid-blur: 18px;
+        --vid-borde: rgba(140, 195, 255, .16);
+        --vid-luz: rgba(180, 220, 255, .42);
+        --vid-brillo: rgba(79, 163, 255, .28);
+        --vid-alta:
+          0 2px 6px rgba(0, 0, 0, .6),
+          0 36px 66px -28px rgba(11, 99, 196, .55),
+          0 0 0 1px rgba(79, 163, 255, .20);
+      }
+    }
+
+    /* ---------- 2. El fondo ----------
+       Malla de circuito fija + tres focos azules muy difusos. Van en
+       pseudo-elementos del body: cero nodos extra, cero JS. */
+    body {
+      font-family: var(--sans);
+      font-size: 14.5px;
+      letter-spacing: -.005em;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, var(--circuito) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--circuito) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: radial-gradient(ellipse 120% 80% at 50% 0%, #000 15%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse 120% 80% at 50% 0%, #000 15%, transparent 80%);
+    }
+
+    /* Tres focos azules muy difusos sobre el negro. Fijos: el contenido
+       pasa por encima de la luz en vez de arrastrarla. */
+    :root[data-theme="dark"] body {
+      background-image:
+        radial-gradient(1100px 620px at 8% -10%, rgba(11, 99, 196, .20), transparent 60%),
+        radial-gradient(900px 560px at 95% 4%, rgba(79, 163, 255, .12), transparent 58%),
+        radial-gradient(1000px 640px at 55% 110%, rgba(11, 99, 196, .10), transparent 60%);
+      background-attachment: fixed;
+    }
+
+    /* En "automático" los focos solo aparecen si el sistema está en
+       oscuro: sobre el fondo claro dejaban una neblina azul. */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]):not([data-theme="dark"]) body {
+        background-image:
+          radial-gradient(1100px 620px at 8% -10%, rgba(11, 99, 196, .20), transparent 60%),
+          radial-gradient(900px 560px at 95% 4%, rgba(79, 163, 255, .12), transparent 58%),
+          radial-gradient(1000px 640px at 55% 110%, rgba(11, 99, 196, .10), transparent 60%);
+        background-attachment: fixed;
+      }
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+    }
+
+    h1,
+    h2,
+    h3 {
+      letter-spacing: -.028em;
+    }
+
+    .num,
+    .mono,
+    .tile .v,
+    .cell-name small,
+    .mi-date {
+      font-family: var(--mono);
+      font-feature-settings: "tnum" 1;
+    }
+
+    /* ---------- 3. Barra de marca ----------
+       Sticky, con la lluvia de datos detras. La mascara la apaga hacia
+       abajo y hacia la derecha para que el texto no compita con ella. */
+    .pgt-top {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      height: var(--pgt-h);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      isolation: isolate;
+      background: color-mix(in srgb, var(--surface) 82%, transparent);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      backdrop-filter: blur(16px) saturate(140%);
+      border-bottom: 1px solid var(--vid-borde);
+    }
+
+    .pgt-top::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: .5;
+      pointer-events: none;
+    }
+
+    .pgt-lluvia {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: .38;
+      mask-image: linear-gradient(90deg, #000 0%, #000 34%, transparent 72%);
+      -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 34%, transparent 72%);
+    }
+
+    :root[data-theme="dark"] .pgt-lluvia {
+      opacity: .55;
+    }
+
+    .pgt-top-in {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 20px 0 14px;
+    }
+
+    .pgt-marca {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      color: var(--ink);
+      padding: 6px 8px;
+      border-radius: 10px;
+      transition: background .2s var(--curva);
+    }
+
+    .pgt-marca:hover {
+      background: var(--accent-soft);
+    }
+
+    .pgt-logo {
+      width: 38px;
+      height: 38px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: var(--on-accent);
+      background: linear-gradient(145deg, var(--accent), var(--accent-ink));
+      box-shadow: 0 0 0 1px var(--vid-borde), 0 8px 18px -8px rgba(11, 99, 196, .7);
+    }
+
+    .pgt-logo svg {
+      width: 21px;
+      height: 21px;
+    }
+
+    .pgt-marca-txt b {
+      display: block;
+      font-family: var(--display);
+      font-weight: 800;
+      font-size: 15.5px;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+    }
+
+    .pgt-marca-txt small {
+      display: block;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--faint);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .pgt-top-acc {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pgt-vivo {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .pgt-vivo i {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--ok);
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent);
+      animation: pgt-latido 2.4s var(--curva) infinite;
+    }
+
+    @keyframes pgt-latido {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 55%, transparent);
+      }
+
+      50% {
+        box-shadow: 0 0 0 5px transparent;
+      }
+    }
+
+    .pgt-btn {
+      display: inline-flex;
+      align-items: center;
+      /* El minimo tactil es 44x44; aqui 42 mas el aire de la barra. */
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 9px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: var(--on-accent);
+      font-weight: 600;
+      font-size: 13px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: box-shadow .26s var(--curva), transform .18s var(--curva), filter .26s ease;
+    }
+
+    .pgt-btn:hover,
+    .pgt-btn:focus-visible {
+      transform: translateY(-1px);
+      filter: brightness(1.07);
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--accent) 60%, transparent),
+        0 0 18px rgba(11, 99, 196, .5),
+        0 0 40px rgba(11, 99, 196, .26);
+    }
+
+    .pgt-btn.ghost {
+      background: none;
+      color: var(--muted);
+      border-color: var(--line-strong);
+    }
+
+    .pgt-btn.ghost:hover,
+    .pgt-btn.ghost:focus-visible {
+      color: var(--ink);
+      border-color: var(--accent);
+      box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 22%, transparent);
+    }
+
+    /* El logotipo cae letra por letra, como en el sitio. El texto real
+       queda en una copia oculta para el lector de pantalla. */
+    .letra {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(-.9em);
+      animation: pgt-caer .46s cubic-bezier(.22, .9, .3, 1) forwards;
+      animation-delay: var(--d, 0ms);
+    }
+
+    @keyframes pgt-caer {
+      0% {
+        opacity: 0;
+        transform: translateY(-.9em);
+        color: var(--accent);
+      }
+
+      55% {
+        opacity: 1;
+        color: var(--accent);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+        color: inherit;
+      }
+    }
+
+    .pgt-marca:hover .letra,
+    .pgt-marca:focus-within .letra {
+      animation: pgt-recaer .5s cubic-bezier(.22, .9, .3, 1) both;
+      animation-delay: var(--dh, 0ms);
+    }
+
+    @keyframes pgt-recaer {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      30% {
+        transform: translateY(-.5em);
+        opacity: .25;
+        color: var(--accent);
+      }
+
+      100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .pgt-sr {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    /* ---------- 4. Vidrio de instrumento ----------
+       Solidez alta a proposito: debajo hay texto que debe seguir
+       legible. Un panel al 15% es bonito en una captura y falla AA. */
+    .side,
+    .tile,
+    .card,
+    .table-wrap,
+    .drawer,
+    .banner {
+      background: color-mix(in srgb, var(--surface) var(--vid-solidez), transparent);
+      -webkit-backdrop-filter: blur(var(--vid-blur)) saturate(135%);
+      backdrop-filter: blur(var(--vid-blur)) saturate(135%);
+      border: 1px solid var(--vid-borde);
+      box-shadow: var(--shadow);
+    }
+
+    .side {
+      top: var(--pgt-h);
+      height: calc(100vh - var(--pgt-h));
+      border-width: 0 1px 0 0;
+      box-shadow: none;
+      padding: 18px 12px;
+    }
+
+    /* Luz especular en el canto superior: una linea de 1px mas clara en
+       el centro. Dice "hay volumen" sin neblina. */
+    .tile,
+    .card,
+    .table-wrap {
+      position: relative;
+      isolation: isolate;
+    }
+
+    .tile::before,
+    .card::before,
+    .table-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 1px;
+      border-radius: inherit;
+      background: linear-gradient(90deg, transparent, var(--vid-luz) 42%, var(--vid-luz) 58%, transparent);
+      opacity: .9;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* El :not() no es cosmetico: el resplandor es hijo de la tarjeta y
+       sin excluirlo heredaria position:relative y se pintaria ENCIMA
+       del contenido en vez de debajo. */
+    .tile>*:not(.tilt-brillo),
+    .card>*:not(.tilt-brillo) {
+      position: relative;
+      z-index: 3;
+    }
+
+    /* Sin backdrop-filter (Firefox antiguo, aceleracion desactivada):
+       superficie solida en vez de un panel semitransparente ilegible. */
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+
+      .side,
+      .tile,
+      .card,
+      .table-wrap,
+      .drawer,
+      .pgt-top,
+      .banner {
+        background: var(--surface);
+      }
+    }
+
+    /* ---------- 5. Inclinacion 3D y resplandor que sigue al cursor ----------
+       Las variables las escribe el JS. Sin JS, o con puntero tactil,
+       los valores por defecto dejan la tarjeta plana y sin brillo. */
+    .js-tilt {
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: box-shadow .28s var(--curva), border-color .28s ease;
+    }
+
+    .tilt-brillo {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity .28s ease;
+      background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%),
+          var(--vid-brillo), transparent 62%);
+    }
+
+    .js-tilt:hover .tilt-brillo,
+    .js-tilt:focus-within .tilt-brillo {
+      opacity: 1;
+    }
+
+    .js-tilt:hover,
+    .js-tilt:focus-within {
+      box-shadow: var(--vid-alta);
+      border-color: color-mix(in srgb, var(--accent) 45%, var(--vid-borde));
+    }
+
+    /* ---------- 6. Baldosas ---------- */
+    .tiles {
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .tile {
+      border-radius: var(--radius);
+      padding: 17px 18px 15px;
+    }
+
+    .tile .k {
+      font-family: var(--mono);
+      letter-spacing: .08em;
+      font-size: 10.5px;
+    }
+
+    .tile .v {
+      font-size: 31px;
+      font-weight: 500;
+      letter-spacing: -.03em;
+    }
+
+    .tile.accent {
+      background:
+        linear-gradient(145deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%),
+        color-mix(in srgb, var(--surface) var(--vid-solidez), transparent);
+      border-color: color-mix(in srgb, var(--accent) 38%, transparent);
+    }
+
+    .tile.accent .v,
+    .tile.accent .k {
+      color: var(--accent-ink);
+    }
+
+    /* El anillo: la misma cifra, en forma. */
+    .anillo {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      z-index: 3;
+    }
+
+    .anillo svg {
+      position: absolute;
+      inset: 0;
+      transform: rotate(-90deg);
+    }
+
+    .anillo circle {
+      fill: none;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+    }
+
+    .anillo-bg {
+      stroke: var(--line);
+    }
+
+    .anillo-v {
+      stroke: var(--accent);
+      /* 2 * PI * 18 = 113.1 */
+      stroke-dasharray: 113.1;
+      stroke-dashoffset: 113.1;
+      animation: pgt-anillo .9s var(--curva) .15s forwards;
+    }
+
+    @keyframes pgt-anillo {
+      to {
+        stroke-dashoffset: calc(113.1 - (113.1 * var(--pct) / 100));
+      }
+    }
+
+    .anillo b {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    /* ---------- 7. Asistencia de la semana ---------- */
+    .semana {
+      margin-top: 16px;
+    }
+
+    .semana-chart {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      align-items: end;
+      padding-top: 4px;
+    }
+
+    .semana-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .semana-n {
+      font-size: 11.5px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .semana-track {
+      width: 100%;
+      height: 96px;
+      display: flex;
+      align-items: flex-end;
+      background: linear-gradient(to top, var(--line-soft, transparent), transparent);
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .semana-track::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 1px;
+      background: var(--line);
+    }
+
+    .semana-fill {
+      width: 100%;
+      min-height: 3px;
+      border-radius: 7px 7px 0 0;
+      background: linear-gradient(to top, color-mix(in srgb, var(--accent) 45%, transparent), var(--accent));
+      height: var(--h);
+      animation: pgt-crecer .6s var(--curva) both;
+      animation-delay: var(--r, 0ms);
+    }
+
+    .semana-fill.hoy {
+      background: linear-gradient(to top, var(--accent), var(--accent-ink));
+      box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
+    }
+
+    @keyframes pgt-crecer {
+      from {
+        height: 0;
+      }
+
+      to {
+        height: var(--h);
+      }
+    }
+
+    .semana-dia {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: var(--faint);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .semana-pie {
+      margin: 14px 0 0;
+      font-size: 11.5px;
+      color: var(--faint);
+    }
+
+    /* ---------- 8. Barras del panel ---------- */
+    .bar-track {
+      background: color-mix(in srgb, var(--ink) 8%, transparent);
+      height: 9px;
+    }
+
+    .bar-fill {
+      background: linear-gradient(90deg, var(--accent-ink), var(--accent));
+      animation: pgt-barra .7s var(--curva) both;
+    }
+
+    @keyframes pgt-barra {
+      from {
+        transform: scaleX(0);
+      }
+
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .bar-fill {
+      transform-origin: left center;
+    }
+
+    /* ---------- 9. Navegacion lateral ---------- */
+    .brand .mark {
+      background: linear-gradient(145deg, var(--accent), var(--accent-ink));
+      box-shadow: 0 6px 16px -8px rgba(11, 99, 196, .8);
+      font-family: var(--mono);
+      font-weight: 500;
+    }
+
+    .nav button {
+      position: relative;
+      min-height: 40px;
+      transition: background .18s var(--curva), color .18s var(--curva);
+    }
+
+    .nav button.active {
+      background: var(--accent-soft);
+      color: var(--accent-ink);
+    }
+
+    /* Marca de posicion: el estado activo no queda solo en el color. */
+    .nav button.active::before {
+      content: "";
+      position: absolute;
+      left: -12px;
+      top: 8px;
+      bottom: 8px;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .nav .count {
+      font-family: var(--mono);
+      background: color-mix(in srgb, var(--ink) 8%, transparent);
+    }
+
+    .themebtn {
+      min-height: 36px;
+      transition: border-color .18s var(--curva), color .18s var(--curva), box-shadow .22s var(--curva);
+    }
+
+    .themebtn:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 18%, transparent);
+    }
+
+    /* ---------- 10. Botones, tabla, formularios ---------- */
+    .btn {
+      min-height: 38px;
+      border-radius: 9px;
+      transition: box-shadow .24s var(--curva), transform .16s var(--curva), filter .24s ease, background .2s ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-1px);
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent),
+        0 0 16px rgba(11, 99, 196, .45);
+    }
+
+    .btn.ghost:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 20%, transparent);
+    }
+
+    .btn.sm {
+      min-height: 32px;
+    }
+
+    .icon-btn {
+      min-width: 32px;
+      min-height: 30px;
+      justify-content: center;
+      transition: color .18s var(--curva), border-color .18s var(--curva), background .18s var(--curva);
+    }
+
+    .icon-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    thead th {
+      background: color-mix(in srgb, var(--surface-2) 80%, transparent);
+      font-family: var(--mono);
+      letter-spacing: .06em;
+    }
+
+    tbody tr.clickable:hover {
+      background: var(--accent-soft);
+    }
+
+    .avatar {
+      background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 22%, transparent), var(--accent-soft));
+      color: var(--accent-ink);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent);
+    }
+
+    .search input,
+    .filters select,
+    .att-toolbar input[type=date],
+    .field input,
+    .field select,
+    .field textarea,
+    .seg,
+    .chip {
+      border-color: var(--line-strong);
+      transition: border-color .18s var(--curva), box-shadow .18s var(--curva);
+    }
+
+    .search input:focus,
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      outline: none;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .chip {
+      min-height: 30px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .pill {
+      font-family: var(--mono);
+      font-weight: 500;
+      font-size: 11px;
+    }
+
+    .banner {
+      background: color-mix(in srgb, var(--warn-soft) 80%, transparent);
+      border-color: color-mix(in srgb, var(--warn) 32%, transparent);
+    }
+
+    /* ---------- 11. Cajon lateral ---------- */
+    .drawer {
+      border-left: 1px solid var(--vid-borde);
+      box-shadow: -30px 0 70px -30px rgba(0, 0, 0, .6);
+    }
+
+    .scrim {
+      background: rgba(3, 8, 16, .55);
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
+    }
+
+    .drawer-foot {
+      background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+    }
+
+    .toast {
+      background: color-mix(in srgb, var(--ink) 94%, transparent);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 34px -12px rgba(0, 0, 0, .7);
+    }
+
+    /* ---------- 12. Aparicion escalonada ----------
+       Solo al cambiar de vista. Reanimar en cada clic seria ruido. */
+    .pgt-entra {
+      animation: pgt-subir .42s var(--curva) backwards;
+      animation-delay: var(--e, 0ms);
+    }
+
+    @keyframes pgt-subir {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .main {
+      max-width: 1280px;
+      padding: 24px 28px 64px;
+    }
+
+    .page-head h1 {
+      font-size: 27px;
+      font-weight: 800;
+    }
+
+    /* ---------- 13. Pantallas pequenas ---------- */
+    @media (max-width: 900px) {
+      :root {
+        --pgt-h: auto;
+      }
+
+      .pgt-top {
+        height: auto;
+        position: static;
+      }
+
+      .pgt-top-in {
+        flex-wrap: wrap;
+        padding: 10px 14px;
+        gap: 10px;
+      }
+
+      .pgt-top-acc {
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .pgt-vivo {
+        margin-right: auto;
+      }
+
+      .pgt-btn {
+        flex: 1;
+        justify-content: center;
+      }
+
+      .side {
+        top: auto;
+        height: auto;
+        border-width: 0 0 1px 0;
+      }
+
+      .semana-track {
+        height: 72px;
+      }
+
+      .main {
+        padding: 18px 14px 56px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .tiles {
+        grid-template-columns: 1fr;
+      }
+
+      .anillo {
+        top: 12px;
+        right: 12px;
+      }
+
+      .pgt-marca-txt small {
+        display: none;
+      }
+    }
+
+    /* ---------- 14. Menos movimiento ----------
+       Todo lo que se repite en bucle se apaga; lo que solo entra, se
+       queda en su estado final. */
+    @media (prefers-reduced-motion: reduce) {
+
+      .pgt-lluvia,
+      .tilt-brillo {
+        display: none !important;
+      }
+
+      .letra,
+      .pgt-marca:hover .letra,
+      .pgt-marca:focus-within .letra {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+
+      .pgt-vivo i {
+        animation: none !important;
+      }
+
+      .semana-fill,
+      .bar-fill,
+      .anillo-v,
+      .pgt-entra {
+        animation: none !important;
+      }
+
+      .anillo-v {
+        stroke-dashoffset: calc(113.1 - (113.1 * var(--pct) / 100));
+      }
+
+      .js-tilt {
+        transform: none !important;
+      }
+
+      .btn:hover,
+      .pgt-btn:hover {
+        transform: none;
+      }
+    }
+
+    @media (hover: none) {
+      .tilt-brillo {
+        display: none;
+      }
+    }
+  </style>
+
 </head>
 
 <body>
+
+  <!-- ==========================================================
+       BARRA DE MARCA — esto es un producto de ProgramasGT, no una
+       demo huerfana. Lleva la lluvia de datos detras y las dos
+       acciones que convierten: ver el catalogo y cotizar.
+       ========================================================== -->
+  <header class="pgt-top">
+    <canvas class="pgt-lluvia" aria-hidden="true"></canvas>
+    <div class="pgt-top-in">
+      <a class="pgt-marca" href="https://programasgt.art/" target="_blank" rel="noopener">
+        <span class="pgt-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M4 7h5M4 12h3M4 17h5" />
+            <rect x="9" y="4" width="11" height="16" rx="2.5" />
+            <path d="M12.5 9.5h4M12.5 13h4M12.5 16.5h2" />
+          </svg>
+        </span>
+        <span class="pgt-marca-txt">
+          <b data-letras>ProgramasGT</b>
+          <small>Sistema de Recursos Humanos</small>
+        </span>
+      </a>
+      <div class="pgt-top-acc">
+        <span class="pgt-vivo"><i aria-hidden="true"></i>Demostración en vivo</span>
+        <a class="pgt-btn ghost" href="https://programasgt.art/#catalogo" target="_blank" rel="noopener">Ver el
+          catálogo</a>
+        <a class="pgt-btn" href="https://programasgt.art/#cotizar" target="_blank" rel="noopener">Cotizar mi
+          versión</a>
+      </div>
+    </div>
+  </header>
 
   <div class="app">
     <aside class="side">
@@ -1398,7 +2488,12 @@
     const filters = { empQ: "", empDep: "", empEstado: "", ausEstado: "", regTipo: "", regEmp: "", attDate: todayISO(), attView: "dia" };
 
     /* ============ utilidades ============ */
-    function todayISO() { const d = new Date(); return d.toISOString().slice(0, 10); }
+    // Fecha LOCAL. Con toISOString, en Guatemala (UTC-6) a partir de las
+    // 18:00 la asistencia se guardaba con la fecha del dia siguiente.
+    function isoLocal(d) {
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
+    function todayISO() { return isoLocal(new Date()); }
     function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
     function $(sel, root) { return (root || document).querySelector(sel); }
     function el(tag, attrs, kids) {
@@ -1528,7 +2623,7 @@
       state.asistencia = activos().slice(0, 4).map((e, i) => (
         { id: uid(), empleadoId: e.id, fecha: t, estado: i === 3 ? "permiso" : "presente", entrada: i === 3 ? "" : "08:0" + i, salida: "", nota: "" }));
     }
-    function addDays(n) { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+    function addDays(n) { const d = new Date(); d.setDate(d.getDate() + n); return isoLocal(d); }
 
     function clearSamplesIfNeeded() {
       if (!sampleMode) return;
@@ -1574,6 +2669,8 @@
         panel: renderPanel, empleados: renderEmpleados, asistencia: renderAsistencia,
         ausencias: renderAusencias, registros: renderRegistros
       }[view] || renderPanel)(main);
+      // La capa visual vuelve a decorar lo que se acaba de pintar.
+      if (window.pgtDecorar) window.pgtDecorar(view);
     }
     function sampleBanner() {
       return el("div", { class: "banner" }, [
@@ -1597,7 +2694,9 @@
       const tiles = el("div", { class: "tiles" });
       tiles.appendChild(tile("Empleados activos", act.length, state.empleados.length + " en total", true));
       tiles.appendChild(tile("Nómina mensual", money(nomina), "Suma de salarios base activos"));
-      tiles.appendChild(tile("Asistencia de hoy", presentesHoy + " / " + act.length, asistHoy.length ? "Registrada" : "Sin registrar aún"));
+      const tAsist = tile("Asistencia de hoy", presentesHoy + " / " + act.length, asistHoy.length ? "Registrada" : "Sin registrar aún");
+      tAsist.appendChild(anilloAsistencia(presentesHoy, act.length));
+      tiles.appendChild(tAsist);
       tiles.appendChild(tile("Ausencias pendientes", pendientes, pendientes ? "Requieren tu aprobación" : "Todo al día"));
       main.appendChild(tiles);
 
@@ -1640,7 +2739,62 @@
       grid.appendChild(alCard);
 
       main.appendChild(grid);
+      main.appendChild(cardSemana());
     }
+
+    /* El anillo repite en forma lo que la baldosa ya dice en numeros: el
+       color nunca es el unico portador del dato (WCAG 1.4.1). */
+    function anilloAsistencia(p, t) {
+      const pct = t ? Math.round(p / t * 100) : 0;
+      const w = el("div", { class: "anillo" });
+      w.setAttribute("aria-hidden", "true");
+      w.innerHTML =
+        '<svg viewBox="0 0 44 44" width="44" height="44">' +
+        '<circle class="anillo-bg" cx="22" cy="22" r="18"/>' +
+        '<circle class="anillo-v" cx="22" cy="22" r="18" style="--pct:' + pct + '"/>' +
+        '</svg><b>' + pct + '%</b>';
+      return w;
+    }
+
+    const DIAS_CORTOS = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+
+    /* Siete dias de asistencia. Es la vista que un gerente mira primero:
+       dice si el equipo esta completo o si el lunes siempre falta gente. */
+    function cardSemana() {
+      const card = el("div", { class: "card semana" });
+      const total = Math.max(1, activos().length);
+      card.appendChild(el("h2", null, ["Asistencia de los últimos 7 días",
+        el("span", { class: "tag", text: "presentes por día" })]));
+
+      const dias = [];
+      for (let i = 6; i >= 0; i--) {
+        const f = addDays(-i);
+        const recs = state.asistencia.filter(a => a.fecha === f);
+        dias.push({ f, presentes: recs.filter(a => a.estado === "presente").length, marcados: recs.length });
+      }
+
+      const chart = el("div", { class: "semana-chart" });
+      dias.forEach((d, i) => {
+        const pct = Math.min(100, Math.round(d.presentes / total * 100));
+        const dd = new Date(d.f + "T00:00:00");
+        const col = el("div", { class: "semana-col", title: fmtDate(d.f) + ": " + d.presentes + " de " + total + " presentes" }, [
+          el("span", { class: "semana-n num", text: String(d.presentes) }),
+          el("div", { class: "semana-track" }, [
+            el("div", { class: "semana-fill" + (i === 6 ? " hoy" : ""), style: "--h:" + pct + "%;--r:" + (i * 45) + "ms" })
+          ]),
+          el("span", { class: "semana-dia", text: DIAS_CORTOS[dd.getDay()] })
+        ]);
+        chart.appendChild(col);
+      });
+      card.appendChild(chart);
+
+      // Alternativa en texto: un lector de pantalla no ve las barras.
+      const resumen = dias.map(d => DIAS_CORTOS[new Date(d.f + "T00:00:00").getDay()] + " " + d.presentes).join(", ");
+      card.appendChild(el("p", { class: "sr", text: "Presentes por día: " + resumen + ". Total de empleados activos: " + total + "." }));
+      card.appendChild(el("p", { class: "semana-pie", text: "Sobre " + total + " empleado(s) activo(s). Los días sin marcar cuentan como cero." }));
+      return card;
+    }
+
     function tile(k, v, s, accent) {
       return el("div", { class: "tile" + (accent ? " accent" : "") }, [
         el("div", { class: "k", text: k }), el("div", { class: "v", text: v }), el("div", { class: "s", text: s })
@@ -2257,13 +3411,15 @@
       const n = $("#themeLbl"); if (n) n.textContent = lbl[t];
     }
     function initTheme() {
-      let t = "system";
-      try { t = localStorage.getItem("rrhh_theme") || "system"; } catch (e) { }
+      // Arranca en oscuro, como el sitio de ProgramasGT. Quien prefiera
+      // claro lo tiene a un clic y la eleccion se recuerda.
+      let t = "dark";
+      try { t = localStorage.getItem("rrhh_theme") || "dark"; } catch (e) { }
       applyTheme(t);
       $("#themeBtn").addEventListener("click", () => {
-        let cur = "system";
-        try { cur = localStorage.getItem("rrhh_theme") || "system"; } catch (e) { }
-        applyTheme({ system: "light", light: "dark", dark: "system" }[cur]);
+        let cur = "dark";
+        try { cur = localStorage.getItem("rrhh_theme") || "dark"; } catch (e) { }
+        applyTheme({ dark: "light", light: "system", system: "dark" }[cur] || "dark");
       });
     }
 
@@ -2291,6 +3447,372 @@
     }
     boot();
   </script>
+  <!-- ==========================================================
+       PIEL PROGRAMASGT — comportamiento
+       Lluvia de datos, logotipo que cae, inclinacion 3D, contadores
+       y foco del cajon lateral. Cero dependencias obligatorias: si
+       Vanilla-Tilt no carga, todo lo demas sigue funcionando.
+       ========================================================== -->
+  <script id="pgt-piel-js">
+    (function () {
+      "use strict";
+
+      var mqMenos = window.matchMedia("(prefers-reduced-motion: reduce)");
+      var mqFino = window.matchMedia("(hover:hover) and (pointer:fine)");
+
+      /* ============ 1. Lluvia de datos ============
+         Azul, no verde: el verde es el Matrix de todo el mundo. En el
+         azul de la marca se lee como consola de sistema, que es lo que
+         vende este producto.
+
+         Se pausa con la pestana oculta y tiene techo de 22 fps: a 120 Hz
+         el efecto no se ve mejor y cuesta cuatro veces mas. */
+      (function lluvia() {
+        var barra = document.querySelector(".pgt-top");
+        var lienzo = document.querySelector(".pgt-lluvia");
+        if (!barra || !lienzo) return;
+
+        var ctx = lienzo.getContext("2d");
+        if (!ctx) { lienzo.remove(); return; }
+
+        var GLIFOS = "0123456789ABCDEF<>/\\[]{}=+*".split("");
+        var CELDA = 16;
+        var ESTELA = 7;
+        var PASO_MS = 1000 / 22;
+
+        var gotas = [], ancho = 0, alto = 0, cols = 0;
+        var rafId = 0, ultimo = 0, acumulado = 0, visible = !document.hidden;
+
+        function oscuro() {
+          var t = document.documentElement.getAttribute("data-theme");
+          if (t === "dark") return true;
+          if (t === "light") return false;
+          return window.matchMedia("(prefers-color-scheme: dark)").matches;
+        }
+
+        function medir() {
+          var caja = barra.getBoundingClientRect();
+          ancho = Math.max(1, Math.round(caja.width));
+          alto = Math.max(1, Math.round(caja.height));
+
+          // Topamos el ratio: en una pantalla Retina respetarlo pintaria
+          // cuatro veces mas pixeles para un efecto a media opacidad.
+          var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+          lienzo.width = Math.round(ancho * dpr);
+          lienzo.height = Math.round(alto * dpr);
+          lienzo.style.width = ancho + "px";
+          lienzo.style.height = alto + "px";
+
+          // setTransform y no scale: scale se acumula en cada medida.
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.font = "500 12px 'JetBrains Mono', ui-monospace, monospace";
+          ctx.textBaseline = "top";
+
+          cols = Math.ceil(ancho / CELDA);
+          var cuantas = Math.max(6, Math.round(cols * 0.40));
+          gotas = new Array(cuantas);
+          for (var i = 0; i < cuantas; i++) gotas[i] = nueva(true);
+        }
+
+        function nueva(inicial) {
+          return {
+            col: (Math.random() * cols) | 0,
+            y: inicial ? Math.random() * alto : -ESTELA * CELDA,
+            v: 0.5 + Math.random() * 1.3,
+            glifos: sembrar()
+          };
+        }
+
+        function sembrar() {
+          var a = new Array(ESTELA);
+          for (var i = 0; i < ESTELA; i++) a[i] = GLIFOS[(Math.random() * GLIFOS.length) | 0];
+          return a;
+        }
+
+        function dibujar() {
+          ctx.clearRect(0, 0, ancho, alto);
+          var claro = oscuro() ? "#9CC9FF" : "#0B63C4";
+          var cuerpo = oscuro() ? "#4FA3FF" : "#0B63C4";
+
+          for (var i = 0; i < gotas.length; i++) {
+            var g = gotas[i];
+            var x = g.col * CELDA;
+
+            for (var j = 0; j < ESTELA; j++) {
+              var y = g.y - j * CELDA;
+              if (y < -CELDA || y > alto) continue;
+              // La estela se apaga hacia arriba; la cabeza va mas clara.
+              ctx.globalAlpha = Math.pow(1 - j / ESTELA, 1.7);
+              ctx.fillStyle = j === 0 ? claro : cuerpo;
+              ctx.fillText(g.glifos[j], x, y);
+            }
+
+            g.y += g.v * 6;
+
+            // Cambiar un glifo de vez en cuando: cambiarlos todos en cada
+            // fotograma se ve como parpadeo, no como datos.
+            if (Math.random() < .3) {
+              g.glifos[(Math.random() * ESTELA) | 0] = GLIFOS[(Math.random() * GLIFOS.length) | 0];
+            }
+
+            if (g.y - ESTELA * CELDA > alto) gotas[i] = nueva(false);
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        function bucle(ahora) {
+          rafId = requestAnimationFrame(bucle);
+          if (!ultimo) { ultimo = ahora; return; }
+          var delta = ahora - ultimo;
+          ultimo = ahora;
+          // Al volver de una pestana oculta el delta trae cientos de ms:
+          // sin tope habria un salto o una rafaga de recuperacion.
+          if (delta > 250) delta = PASO_MS;
+          acumulado += delta;
+          if (acumulado < PASO_MS) return;
+          acumulado %= PASO_MS;
+          dibujar();
+        }
+
+        function sincronizar() {
+          var debe = visible && !mqMenos.matches;
+          if (debe && !rafId) {
+            ultimo = 0; acumulado = 0;
+            rafId = requestAnimationFrame(bucle);
+          } else if (!debe && rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = 0;
+            ctx.clearRect(0, 0, ancho, alto);
+          }
+        }
+
+        document.addEventListener("visibilitychange", function () {
+          visible = !document.hidden;
+          sincronizar();
+        });
+
+        // En movil, mostrar u ocultar la barra de direcciones dispara
+        // resize cambiando solo la altura: filtramos por ancho.
+        var temp = 0, anchoPrevio = window.innerWidth;
+        window.addEventListener("resize", function () {
+          if (Math.abs(window.innerWidth - anchoPrevio) < 24) return;
+          anchoPrevio = window.innerWidth;
+          clearTimeout(temp);
+          temp = setTimeout(medir, 200);
+        }, { passive: true });
+
+        if (mqMenos.addEventListener) mqMenos.addEventListener("change", sincronizar);
+
+        medir();
+        sincronizar();
+      })();
+
+      /* ============ 2. El logotipo cae letra por letra ============
+         El texto real se conserva en una copia oculta para que un lector
+         de pantalla lea "ProgramasGT", no "P-r-o-g-r-a-m-a-s". */
+      (function logotipo() {
+        var destino = document.querySelector("[data-letras]");
+        if (!destino) return;
+
+        var texto = destino.textContent.trim();
+        var sr = document.createElement("span");
+        sr.className = "pgt-sr";
+        sr.textContent = texto;
+
+        destino.textContent = "";
+        destino.appendChild(sr);
+
+        if (mqMenos.matches) {
+          destino.appendChild(document.createTextNode(texto));
+          return;
+        }
+
+        var envoltura = document.createElement("span");
+        envoltura.setAttribute("aria-hidden", "true");
+        texto.split("").forEach(function (ch, i) {
+          var l = document.createElement("span");
+          l.className = "letra";
+          l.textContent = ch;
+          l.style.setProperty("--d", (i * 38) + "ms");
+          l.style.setProperty("--dh", (i * 26) + "ms");
+          envoltura.appendChild(l);
+        });
+        destino.appendChild(envoltura);
+      })();
+
+      /* ============ 3. Contadores ============
+         Solo se animan cuando el valor CAMBIA. Si se reanimaran en cada
+         repintado, marcar una asistencia haria bailar las cuatro cifras. */
+      var memoria = {};
+
+      function animarCifra(nodo, clave) {
+        var destino = nodo.textContent;
+        var m = destino.match(/^(\D*?)([\d.,]+)([\s\S]*)$/);
+        if (!m) return;
+
+        var fin = parseFloat(m[2].replace(/,/g, ""));
+        if (!isFinite(fin)) return;
+
+        var decimales = /\.\d\d$/.test(m[2]) ? 2 : 0;
+        var ini = memoria[clave];
+        memoria[clave] = fin;
+
+        // Primera pintura: sube desde cero. Despues, solo si el dato cambia.
+        if (ini === undefined) ini = 0;
+        if (ini === fin || mqMenos.matches) return;
+
+        var t0 = 0, dur = 480;
+        function formatear(v) {
+          return m[1] + v.toLocaleString("es-GT", {
+            minimumFractionDigits: decimales, maximumFractionDigits: decimales
+          }) + m[3];
+        }
+        function paso(ahora) {
+          if (!t0) t0 = ahora;
+          var p = Math.min(1, (ahora - t0) / dur);
+          // Desaceleracion: la cifra llega, no frena de golpe.
+          var e = 1 - Math.pow(1 - p, 3);
+          nodo.textContent = formatear(ini + (fin - ini) * e);
+          if (p < 1) requestAnimationFrame(paso);
+          else nodo.textContent = destino;
+        }
+        requestAnimationFrame(paso);
+      }
+
+      /* ============ 4. Inclinacion 3D y resplandor ============ */
+      function seguirBrillo(el) {
+        var rect = null, pendiente = false, px = 0, py = 0;
+        el.addEventListener("mouseenter", function () {
+          rect = el.getBoundingClientRect();
+        }, { passive: true });
+        el.addEventListener("mousemove", function (e) {
+          if (!rect) return;
+          px = e.clientX; py = e.clientY;
+          if (pendiente) return;
+          pendiente = true;
+          requestAnimationFrame(function () {
+            pendiente = false;
+            if (!rect) return;
+            el.style.setProperty("--mx", (((px - rect.left) / rect.width) * 100).toFixed(1) + "%");
+            el.style.setProperty("--my", (((py - rect.top) / rect.height) * 100).toFixed(1) + "%");
+          });
+        }, { passive: true });
+        el.addEventListener("mouseleave", function () { rect = null; }, { passive: true });
+      }
+
+      function inclinar(tarjetas) {
+        tarjetas.forEach(function (el) {
+          if (el.querySelector(".tilt-brillo")) return;
+          var b = document.createElement("span");
+          b.className = "tilt-brillo";
+          b.setAttribute("aria-hidden", "true");
+          el.insertBefore(b, el.firstChild);
+        });
+
+        if (mqMenos.matches || !mqFino.matches) return;
+
+        tarjetas.forEach(function (el) {
+          if (el.classList.contains("js-tilt")) return;
+          el.classList.add("js-tilt");
+          seguirBrillo(el);
+          // 4 grados: es un panel de trabajo, no una tarjeta de producto.
+          if (window.VanillaTilt) {
+            window.VanillaTilt.init(el, {
+              max: 4, speed: 420, scale: 1.008, glare: false,
+              perspective: 1000, gyroscope: false
+            });
+          }
+        });
+      }
+
+      /* ============ 5. Decorar lo recien pintado ============
+         El panel vuelve a dibujar #main entero en cada cambio. Esta
+         funcion la llama render() al terminar. */
+      var vistaPrevia = null;
+
+      window.pgtDecorar = function (vista) {
+        var main = document.getElementById("main");
+        if (!main) return;
+
+        var tarjetas = Array.prototype.slice.call(main.querySelectorAll(".tile, .card"));
+        inclinar(tarjetas);
+
+        main.querySelectorAll(".tile").forEach(function (t) {
+          var v = t.querySelector(".v"), k = t.querySelector(".k");
+          if (v && k) animarCifra(v, k.textContent);
+        });
+
+        // La aparicion escalonada solo al cambiar de seccion: repetirla
+        // en cada clic convertiria el panel en una feria.
+        if (vista !== vistaPrevia && !mqMenos.matches) {
+          vistaPrevia = vista;
+          var bloques = Array.prototype.slice.call(
+            main.querySelectorAll(".tile, .card, .table-wrap, .empty, .toolbar, .att-toolbar")
+          );
+          bloques.forEach(function (b, i) {
+            b.classList.remove("pgt-entra");
+            // Reinicio del flujo: sin esto el navegador reutiliza la
+            // animacion anterior y no vuelve a correr.
+            void b.offsetWidth;
+            b.style.setProperty("--e", Math.min(i * 45, 320) + "ms");
+            b.classList.add("pgt-entra");
+          });
+        }
+      };
+
+      /* ============ 6. Foco del cajon lateral ============
+         Al abrir, el foco entra al primer campo; al cerrar, vuelve a
+         donde estaba. Tab queda atrapado dentro mientras esta abierto. */
+      (function cajon() {
+        var cajon = document.getElementById("drawer");
+        if (!cajon) return;
+        var anterior = null;
+
+        function focoables() {
+          return Array.prototype.slice.call(cajon.querySelectorAll(
+            'a[href], button:not([disabled]), input:not([type=hidden]), select, textarea, [tabindex]:not([tabindex="-1"])'
+          )).filter(function (n) { return n.offsetParent !== null; });
+        }
+
+        new MutationObserver(function () {
+          var abierto = cajon.classList.contains("open");
+          if (abierto && !cajon.dataset.pgtAbierto) {
+            cajon.dataset.pgtAbierto = "1";
+            anterior = document.activeElement;
+            setTimeout(function () {
+              var campo = cajon.querySelector(".drawer-body input, .drawer-body select, .drawer-body textarea")
+                || cajon.querySelector(".drawer-foot .btn");
+              if (campo) campo.focus();
+            }, 80);
+          } else if (!abierto && cajon.dataset.pgtAbierto) {
+            delete cajon.dataset.pgtAbierto;
+            if (anterior && anterior.focus && document.contains(anterior)) anterior.focus();
+            anterior = null;
+          }
+        }).observe(cajon, { attributes: true, attributeFilter: ["class"] });
+
+        document.addEventListener("keydown", function (ev) {
+          if (ev.key !== "Tab" || !cajon.classList.contains("open")) return;
+          var lista = focoables();
+          if (!lista.length) return;
+          var primero = lista[0], ultimo = lista[lista.length - 1];
+          if (ev.shiftKey && document.activeElement === primero) {
+            ev.preventDefault(); ultimo.focus();
+          } else if (!ev.shiftKey && document.activeElement === ultimo) {
+            ev.preventDefault(); primero.focus();
+          }
+        });
+      })();
+
+      /* La primera pintura ocurre antes de que este script corra: el
+         panel ya esta en pantalla, asi que lo decoramos una vez aqui. */
+      if (window.pgtDecorar) window.pgtDecorar("panel");
+      document.addEventListener("DOMContentLoaded", function () {
+        window.pgtDecorar(vistaPrevia || "panel");
+      });
+    })();
+  </script>
+
 </body>
 
 </html>
